@@ -4,8 +4,22 @@
 
 #include <array>
 
-// Alarm time and the weekdays (Monday first) on which the alarm is active.
-struct AlarmSettings {
+// Alarm of a single weekday.
+struct AlarmDay {
+	bool isActive = false;
 	QTime time = QTime(6, 45);
-	std::array<bool, 7> activeDays = {true, true, true, true, true, false, false};
+};
+
+// Global alarm switch and one alarm per weekday (Monday first).
+struct AlarmSettings {
+	static constexpr int dayCount = 7;
+
+	AlarmSettings() {
+		for (int dayIndex = 0; dayIndex < 5; ++dayIndex) {
+			days.at(static_cast<size_t>(dayIndex)).isActive = true;
+		}
+	}
+
+	bool isEnabled = true;
+	std::array<AlarmDay, dayCount> days;
 };

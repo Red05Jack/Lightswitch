@@ -46,8 +46,10 @@ latitude=47.0707     ; weather location in degrees
 longitude=15.4395
 
 [alarm]
-time=06:45           ; HH:mm, switches the light on
-days=Mon,Tue,Wed,Thu,Fri
+enabled=true         ; global alarm switch
+time=06:45           ; HH:mm, default time of all days
+mon=06:30            ; optional time per weekday (mon..sun)
+days=Mon,Tue,Wed,Thu,Fri   ; days on which the alarm rings
 
 [nightmode]
 enabled=true         ; screen goes dark after 5 minutes without input ...
@@ -60,6 +62,7 @@ Night mode shows only a dark clock on a black screen; a touch wakes it up.
 ## Operation
 
 - Tap the Time tile: night mode starts immediately (any touch wakes it up again).
+- Long press the Alarm tile: alarm settings with the global switch and an on/off flag and time for each weekday. The tile shows the time of the next alarm (OFF when none).
 - Long press the Time tile: global settings for the weather location (preset cities) and night mode (on/off, start and end time). Changes are saved to the configuration file.
 
 Missing or invalid values fall back to these defaults. Weather data comes from [Open-Meteo](https://open-meteo.com/) (no API key needed).

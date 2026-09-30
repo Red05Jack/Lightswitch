@@ -29,6 +29,7 @@ AppController::AppController(const Configuration& configuration, const QString& 
 
 	connect(&m_weatherService, &WeatherService::ForecastReady, &m_weatherModel, &WeatherModel::SetForecast);
 	connect(&m_alarmController, &AlarmController::Triggered, &m_nightModeController, &NightModeController::Wake);
+	connect(&m_alarmController, &AlarmController::SettingsChanged, &m_saveTimer, qOverload<>(&QTimer::start));
 	connect(&m_nightModeController, &NightModeController::SettingsChanged, &m_saveTimer, qOverload<>(&QTimer::start));
 	connect(&m_locationController, &LocationController::LocationChanged, &m_saveTimer, qOverload<>(&QTimer::start));
 	connect(&m_locationController, &LocationController::LocationChanged, this, [this](const LocationSettings& location) {
@@ -101,6 +102,7 @@ void AppController::Start() {
 void AppController::SaveConfiguration() {
 	m_saveTimer.stop();
 	m_configuration.SetLocation(m_locationController.Location());
+	m_configuration.SetAlarm(m_alarmController.Settings());
 	m_configuration.SetNightMode(m_nightModeController.Settings());
 
 	if (!m_configuration.Save(m_configurationPath)) {

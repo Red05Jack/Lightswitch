@@ -1,6 +1,8 @@
 import QtQuick
 
 Tile {
+	signal settingsRequested()
+
 	x: 485
 	y: 485
 	width: 220
@@ -13,7 +15,7 @@ Tile {
 		isHeavy: true
 		font.pixelSize: Theme.valueSize
 		color: Theme.value
-		text: app.alarm.timeText
+		text: app.alarm.nextAlarmText
 	}
 
 	Repeater {
@@ -22,8 +24,14 @@ Tile {
 		TileText {
 			x: 14 + index * 25.2
 			baselineY: 205
-			color: app.alarm.activeDays[index] ? Theme.accent : Theme.label
+			color: app.alarm.isEnabled && app.alarm.activeDays[index] ? Theme.accent : Theme.label
 			text: "MTWTFSS"[index]
 		}
+	}
+
+	// A long press opens the alarm settings.
+	MouseArea {
+		anchors.fill: parent
+		onPressAndHold: parent.settingsRequested()
 	}
 }

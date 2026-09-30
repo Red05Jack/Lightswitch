@@ -16,6 +16,15 @@ QString WriteIniFile(const QTemporaryDir& directory, const QByteArray& content) 
 }
 
 using Days = std::array<bool, 7>;
+
+// Returns the active flags of all weekdays, Monday first.
+Days ActiveFlags(const AlarmSettings& alarm) {
+	Days flags = {};
+	for (size_t dayIndex = 0; dayIndex < flags.size(); ++dayIndex) {
+		flags.at(dayIndex) = alarm.days.at(dayIndex).isActive;
+	}
+	return flags;
+}
 }
 
 class ConfigurationTest : public QObject {
@@ -30,6 +39,8 @@ private slots:
 	void ReadsNightMode();
 	void InvalidNightModeUsesDefaults();
 	void SavesAndReloadsChangedSettings();
+	void ReadsAlarmTimePerWeekday();
+	void SavesAlarmTimesAndSwitch();
 };
 
 void ConfigurationTest::LoadsValidFile() {
@@ -42,8 +53,8 @@ void ConfigurationTest::LoadsValidFile() {
 	QCOMPARE(configuration.Location().latitude, 52.52);
 	QCOMPARE(configuration.Location().longitude, 13.405);
 	QCOMPARE(configuration.Location().name, QStringLiteral("Custom"));
-	QCOMPARE(configuration.Alarm().time, QTime(7, 30));
-	QCOMPARE(configuration.Alarm().activeDays, (Days{true, false, true, false, false, false, true}));
+	QCOMPARE(configuration.Alarm().days.at(4).time, QTime(7, 30));
+	QCOMPARE(ActiveFlags(configuration.Alarm()), (Days{true, false, true, false, false, false, true}));
 }
 
 void ConfigurationTest::ReadsNightMode() {
@@ -76,8 +87,8 @@ void ConfigurationTest::MissingFileUsesDefaults() {
 	QCOMPARE(configuration.Location().name, QStringLiteral("Graz"));
 	QCOMPARE(configuration.Location().latitude, 47.0707);
 	QCOMPARE(configuration.Location().longitude, 15.4395);
-	QCOMPARE(configuration.Alarm().time, QTime(6, 45));
-	QCOMPARE(configuration.Alarm().activeDays, (Days{true, true, true, true, true, false, false}));
+	QCOMPARE(configuration.Alarm().days.at(4).time, QTime(6, 45));
+	QCOMPARE(ActiveFlags(configuration.Alarm()), (Days{true, true, true, true, true, false, false}));
 }
 
 void ConfigurationTest::EmptyFileUsesDefaults() {
@@ -87,7 +98,7 @@ void ConfigurationTest::EmptyFileUsesDefaults() {
 	const Configuration configuration = Configuration::Load(path);
 
 	QCOMPARE(configuration.Location().latitude, 47.0707);
-	QCOMPARE(configuration.Alarm().time, QTime(6, 45));
+	QCOMPARE(configuration.Alarm().days.at(4).time, QTime(6, 45));
 }
 
 void ConfigurationTest::InvalidValuesUseDefaults() {
@@ -100,8 +111,8 @@ void ConfigurationTest::InvalidValuesUseDefaults() {
 	QCOMPARE(configuration.Location().name, QStringLiteral("Graz"));
 	QCOMPARE(configuration.Location().latitude, 47.0707);
 	QCOMPARE(configuration.Location().longitude, 15.4395);
-	QCOMPARE(configuration.Alarm().time, QTime(6, 45));
-	QCOMPARE(configuration.Alarm().activeDays, (Days{false, false, false, false, false, false, false}));
+	QCOMPARE(configuration.Alarm().days.at(4).time, QTime(6, 45));
+	QCOMPARE(ActiveFlags(configuration.Alarm()), (Days{false, false, false, false, false, false, false}));
 }
 
 void ConfigurationTest::ParsesActiveDays() {
@@ -133,8 +144,42 @@ void ConfigurationTest::SavesAndReloadsChangedSettings() {
 	QVERIFY(!reloaded.NightMode().isEnabled);
 	QCOMPARE(reloaded.NightMode().startTime, QTime(21, 30));
 	QCOMPARE(reloaded.NightMode().endTime, QTime(7, 15));
-	QCOMPARE(reloaded.Alarm().time, QTime(7, 30));
-	QCOMPARE(reloaded.Alarm().activeDays, (Days{true, false, true, false, false, false, false}));
+	QCOMPARE(reloaded.Alarm().days.at(2).time, QTime(7, 30));
+	QCOMPARE(ActiveFlags(reloaded.Alarm()), (Days{true, false, true, false, false, false, false}));
+}
+
+void ConfigurationTest::ReadsAlarmTimePerWeekday() {
+	QTemporaryDir directory;
+	const QString path = WriteIniFile(directory,
+		"[alarm]\nenabled=false\ntime=06:00\nmon=05:30\nsun=10:15\ndays=Mon,Sun\n");
+
+	const Configuration configuration = Configuration::Load(path);
+
+	QVERIFY(!configuration.Alarm().isEnabled);
+	QCOMPARE(configuration.Alarm().days.at(0).time, QTime(5, 30));
+	QCOMPARE(configuration.Alarm().days.at(1).time, QTime(6, 0));
+	QCOMPARE(configuration.Alarm().days.at(6).time, QTime(10, 15));
+	QCOMPARE(ActiveFlags(configuration.Alarm()), (Days{true, false, false, false, false, false, true}));
+}
+
+void ConfigurationTest::SavesAlarmTimesAndSwitch() {
+	QTemporaryDir directory;
+	const QString path = WriteIniFile(directory, "");
+	Configuration configuration = Configuration::Load(path);
+	AlarmSettings alarm;
+	alarm.isEnabled = false;
+	alarm.days.at(1).time = QTime(5, 5);
+	alarm.days.at(5).isActive = true;
+	alarm.days.at(5).time = QTime(9, 0);
+	configuration.SetAlarm(alarm);
+
+	QVERIFY(configuration.Save(path));
+	const Configuration reloaded = Configuration::Load(path);
+
+	QVERIFY(!reloaded.Alarm().isEnabled);
+	QCOMPARE(reloaded.Alarm().days.at(1).time, QTime(5, 5));
+	QCOMPARE(reloaded.Alarm().days.at(5).time, QTime(9, 0));
+	QCOMPARE(ActiveFlags(reloaded.Alarm()), (Days{true, true, true, true, true, true, false}));
 }
 
 QTEST_GUILESS_MAIN(ConfigurationTest)

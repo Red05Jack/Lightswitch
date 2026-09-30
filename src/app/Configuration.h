@@ -13,6 +13,7 @@ class Configuration {
 public:
 	static Configuration Load(const QString& filePath);
 	static std::array<bool, 7> ParseActiveDays(const QString& text);
+	static QString FormatActiveDays(const std::array<bool, 7>& activeDays);
 
 	bool Save(const QString& filePath) const;
 
@@ -21,6 +22,7 @@ public:
 	const NightModeSettings& NightMode() const;
 
 	void SetLocation(const LocationSettings& location);
+	void SetAlarm(const AlarmSettings& alarm);
 	void SetNightMode(const NightModeSettings& nightMode);
 
 private:

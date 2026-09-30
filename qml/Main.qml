@@ -25,10 +25,21 @@ Window {
 		LightTile {}
 		WeatherTile {}
 		CalendarTile {}
-		AlarmTile {}
+		AlarmTile {
+			onSettingsRequested: alarmSettingsScreen.visible = true
+		}
 
 		SettingsScreen {
 			id: settingsScreen
+
+			width: 720
+			height: 720
+			visible: false
+			onClosed: visible = false
+		}
+
+		AlarmSettingsScreen {
+			id: alarmSettingsScreen
 
 			width: 720
 			height: 720
