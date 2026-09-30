@@ -35,6 +35,14 @@ void WeatherService::SetRetryInterval(int milliseconds) {
 	m_retryTimer.setInterval(milliseconds);
 }
 
+// Switches to another location and fetches its forecast right away when the service is running.
+void WeatherService::SetLocation(double latitude, double longitude) {
+	m_requestUrl = OpenMeteoParser::BuildRequestUrl(latitude, longitude);
+	if (m_refreshTimer.isActive()) {
+		Refresh();
+	}
+}
+
 // Fetches the forecast immediately and then keeps refreshing it.
 void WeatherService::Start() {
 	Refresh();
@@ -43,10 +51,17 @@ void WeatherService::Start() {
 
 // Requests a fresh forecast; failures are logged and the previous data stays visible.
 void WeatherService::Refresh() {
+	if (m_pendingReply) {
+		m_pendingReply->disconnect(this);
+		m_pendingReply->abort();
+		m_pendingReply->deleteLater();
+	}
+
 	QNetworkRequest request(m_requestUrl);
 	request.setTransferTimeout(requestTimeoutMilliseconds);
 
 	QNetworkReply* pReply = m_network.get(request);
+	m_pendingReply = pReply;
 	connect(pReply, &QNetworkReply::finished, this, [this, pReply]() { HandleReply(pReply); });
 	qCDebug(lcWeather) << "Requesting forecast" << m_requestUrl;
 }

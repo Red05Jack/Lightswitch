@@ -6,6 +6,8 @@
 namespace {
 constexpr double maximumLatitude = 90.0;
 constexpr double maximumLongitude = 180.0;
+constexpr int coordinateDecimals = 4;
+const QString timeFormat = QStringLiteral("HH:mm");
 
 // Reads a coordinate within +-limit, or returns the fallback when it is missing or invalid.
 double ReadCoordinate(const QSettings& settings, const QString& key, double fallback, double limit) {
@@ -17,18 +19,32 @@ double ReadCoordinate(const QSettings& settings, const QString& key, double fall
 	return value;
 }
 
+// Reads the location section; coordinates that differ from the default and have no name are shown as "Custom".
+void ReadLocation(const QSettings& settings, LocationSettings& location) {
+	const LocationSettings defaultLocation = location;
+	location.latitude = ReadCoordinate(settings, QStringLiteral("location/latitude"), location.latitude, maximumLatitude);
+	location.longitude = ReadCoordinate(settings, QStringLiteral("location/longitude"), location.longitude, maximumLongitude);
+
+	const QString name = settings.value(QStringLiteral("location/name")).toString().trimmed();
+	if (!name.isEmpty()) {
+		location.name = name;
+	} else if (location.latitude != defaultLocation.latitude || location.longitude != defaultLocation.longitude) {
+		location.name = QStringLiteral("Custom");
+	}
+}
+
 // Reads the night mode section; missing or invalid entries keep the values already in the target.
 void ReadNightMode(const QSettings& settings, NightModeSettings& nightMode) {
 	if (settings.contains(QStringLiteral("nightmode/enabled"))) {
 		nightMode.isEnabled = settings.value(QStringLiteral("nightmode/enabled")).toBool();
 	}
 
-	const QTime startTime = QTime::fromString(settings.value(QStringLiteral("nightmode/start")).toString().trimmed(), QStringLiteral("HH:mm"));
+	const QTime startTime = QTime::fromString(settings.value(QStringLiteral("nightmode/start")).toString().trimmed(), timeFormat);
 	if (startTime.isValid()) {
 		nightMode.startTime = startTime;
 	}
 
-	const QTime endTime = QTime::fromString(settings.value(QStringLiteral("nightmode/end")).toString().trimmed(), QStringLiteral("HH:mm"));
+	const QTime endTime = QTime::fromString(settings.value(QStringLiteral("nightmode/end")).toString().trimmed(), timeFormat);
 	if (endTime.isValid()) {
 		nightMode.endTime = endTime;
 	}
@@ -40,10 +56,9 @@ Configuration Configuration::Load(const QString& filePath) {
 	const QSettings settings(filePath, QSettings::IniFormat);
 	Configuration configuration;
 
-	configuration.m_latitude = ReadCoordinate(settings, QStringLiteral("location/latitude"), configuration.m_latitude, maximumLatitude);
-	configuration.m_longitude = ReadCoordinate(settings, QStringLiteral("location/longitude"), configuration.m_longitude, maximumLongitude);
+	ReadLocation(settings, configuration.m_location);
 
-	const QTime alarmTime = QTime::fromString(settings.value(QStringLiteral("alarm/time")).toString().trimmed(), QStringLiteral("HH:mm"));
+	const QTime alarmTime = QTime::fromString(settings.value(QStringLiteral("alarm/time")).toString().trimmed(), timeFormat);
 	if (alarmTime.isValid()) {
 		configuration.m_alarm.time = alarmTime;
 	}
@@ -74,14 +89,25 @@ std::array<bool, 7> Configuration::ParseActiveDays(const QString& text) {
 	return activeDays;
 }
 
-// Returns the latitude of the weather location in degrees.
-double Configuration::Latitude() const {
-	return m_latitude;
+// Writes the location and night mode sections and keeps all other entries of the file; returns false on failure.
+bool Configuration::Save(const QString& filePath) const {
+	QSettings settings(filePath, QSettings::IniFormat);
+
+	settings.setValue(QStringLiteral("location/name"), m_location.name);
+	settings.setValue(QStringLiteral("location/latitude"), QString::number(m_location.latitude, 'f', coordinateDecimals));
+	settings.setValue(QStringLiteral("location/longitude"), QString::number(m_location.longitude, 'f', coordinateDecimals));
+
+	settings.setValue(QStringLiteral("nightmode/enabled"), m_nightMode.isEnabled);
+	settings.setValue(QStringLiteral("nightmode/start"), m_nightMode.startTime.toString(timeFormat));
+	settings.setValue(QStringLiteral("nightmode/end"), m_nightMode.endTime.toString(timeFormat));
+
+	settings.sync();
+	return settings.status() == QSettings::NoError;
 }
 
-// Returns the longitude of the weather location in degrees.
-double Configuration::Longitude() const {
-	return m_longitude;
+// Returns the weather location.
+const LocationSettings& Configuration::Location() const {
+	return m_location;
 }
 
 // Returns the alarm time and active weekdays.
@@ -92,4 +118,14 @@ const AlarmSettings& Configuration::Alarm() const {
 // Returns the night mode schedule.
 const NightModeSettings& Configuration::NightMode() const {
 	return m_nightMode;
+}
+
+// Replaces the weather location.
+void Configuration::SetLocation(const LocationSettings& location) {
+	m_location = location;
+}
+
+// Replaces the night mode schedule.
+void Configuration::SetNightMode(const NightModeSettings& nightMode) {
+	m_nightMode = nightMode;
 }

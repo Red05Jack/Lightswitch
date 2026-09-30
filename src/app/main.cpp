@@ -25,8 +25,9 @@ int main(int argc, char* argv[]) {
 
 	LogConfiguration::Apply();
 
-	const Configuration configuration = Configuration::Load(parser.value(configOption));
-	AppController controller(configuration, parser.isSet(fullscreenOption));
+	const QString configurationPath = parser.value(configOption);
+	const Configuration configuration = Configuration::Load(configurationPath);
+	AppController controller(configuration, configurationPath, parser.isSet(fullscreenOption));
 
 	application.installEventFilter(&controller.InputMonitor());
 

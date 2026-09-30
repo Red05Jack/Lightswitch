@@ -19,11 +19,22 @@ Window {
 		height: 720
 		scale: window.designScale
 
-		TimeTile {}
+		TimeTile {
+			onSettingsRequested: settingsScreen.visible = true
+		}
 		LightTile {}
 		WeatherTile {}
 		CalendarTile {}
 		AlarmTile {}
+
+		SettingsScreen {
+			id: settingsScreen
+
+			width: 720
+			height: 720
+			visible: false
+			onClosed: visible = false
+		}
 	}
 
 	NightOverlay {

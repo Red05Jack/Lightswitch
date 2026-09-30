@@ -29,6 +29,7 @@ private slots:
 	void ParsesActiveDays();
 	void ReadsNightMode();
 	void InvalidNightModeUsesDefaults();
+	void SavesAndReloadsChangedSettings();
 };
 
 void ConfigurationTest::LoadsValidFile() {
@@ -38,8 +39,9 @@ void ConfigurationTest::LoadsValidFile() {
 
 	const Configuration configuration = Configuration::Load(path);
 
-	QCOMPARE(configuration.Latitude(), 52.52);
-	QCOMPARE(configuration.Longitude(), 13.405);
+	QCOMPARE(configuration.Location().latitude, 52.52);
+	QCOMPARE(configuration.Location().longitude, 13.405);
+	QCOMPARE(configuration.Location().name, QStringLiteral("Custom"));
 	QCOMPARE(configuration.Alarm().time, QTime(7, 30));
 	QCOMPARE(configuration.Alarm().activeDays, (Days{true, false, true, false, false, false, true}));
 }
@@ -71,8 +73,9 @@ void ConfigurationTest::MissingFileUsesDefaults() {
 
 	const Configuration configuration = Configuration::Load(directory.filePath(QStringLiteral("missing.ini")));
 
-	QCOMPARE(configuration.Latitude(), 48.1374);
-	QCOMPARE(configuration.Longitude(), 11.5755);
+	QCOMPARE(configuration.Location().name, QStringLiteral("Graz"));
+	QCOMPARE(configuration.Location().latitude, 47.0707);
+	QCOMPARE(configuration.Location().longitude, 15.4395);
 	QCOMPARE(configuration.Alarm().time, QTime(6, 45));
 	QCOMPARE(configuration.Alarm().activeDays, (Days{true, true, true, true, true, false, false}));
 }
@@ -83,7 +86,7 @@ void ConfigurationTest::EmptyFileUsesDefaults() {
 
 	const Configuration configuration = Configuration::Load(path);
 
-	QCOMPARE(configuration.Latitude(), 48.1374);
+	QCOMPARE(configuration.Location().latitude, 47.0707);
 	QCOMPARE(configuration.Alarm().time, QTime(6, 45));
 }
 
@@ -94,8 +97,9 @@ void ConfigurationTest::InvalidValuesUseDefaults() {
 
 	const Configuration configuration = Configuration::Load(path);
 
-	QCOMPARE(configuration.Latitude(), 48.1374);
-	QCOMPARE(configuration.Longitude(), 11.5755);
+	QCOMPARE(configuration.Location().name, QStringLiteral("Graz"));
+	QCOMPARE(configuration.Location().latitude, 47.0707);
+	QCOMPARE(configuration.Location().longitude, 15.4395);
 	QCOMPARE(configuration.Alarm().time, QTime(6, 45));
 	QCOMPARE(configuration.Alarm().activeDays, (Days{false, false, false, false, false, false, false}));
 }
@@ -107,6 +111,30 @@ void ConfigurationTest::ParsesActiveDays() {
 		(Days{false, false, false, false, false, true, true}));
 	QCOMPARE(Configuration::ParseActiveDays(QString()),
 		(Days{false, false, false, false, false, false, false}));
+}
+
+void ConfigurationTest::SavesAndReloadsChangedSettings() {
+	QTemporaryDir directory;
+	const QString path = WriteIniFile(directory, "[alarm]\ntime=07:30\ndays=Mon,Wed\n");
+	Configuration configuration = Configuration::Load(path);
+	configuration.SetLocation({QStringLiteral("Vienna"), 48.2082, 16.3738});
+	NightModeSettings nightMode;
+	nightMode.isEnabled = false;
+	nightMode.startTime = QTime(21, 30);
+	nightMode.endTime = QTime(7, 15);
+	configuration.SetNightMode(nightMode);
+
+	QVERIFY(configuration.Save(path));
+	const Configuration reloaded = Configuration::Load(path);
+
+	QCOMPARE(reloaded.Location().name, QStringLiteral("Vienna"));
+	QCOMPARE(reloaded.Location().latitude, 48.2082);
+	QCOMPARE(reloaded.Location().longitude, 16.3738);
+	QVERIFY(!reloaded.NightMode().isEnabled);
+	QCOMPARE(reloaded.NightMode().startTime, QTime(21, 30));
+	QCOMPARE(reloaded.NightMode().endTime, QTime(7, 15));
+	QCOMPARE(reloaded.Alarm().time, QTime(7, 30));
+	QCOMPARE(reloaded.Alarm().activeDays, (Days{true, false, true, false, false, false, false}));
 }
 
 QTEST_GUILESS_MAIN(ConfigurationTest)

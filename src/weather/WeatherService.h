@@ -4,6 +4,7 @@
 
 #include <QNetworkAccessManager>
 #include <QObject>
+#include <QPointer>
 #include <QTimer>
 #include <QUrl>
 
@@ -18,6 +19,7 @@ public:
 	explicit WeatherService(const QUrl& requestUrl, QObject* pParent = nullptr);
 
 	void SetRetryInterval(int milliseconds);
+	void SetLocation(double latitude, double longitude);
 	void Start();
 	void Refresh();
 
@@ -28,6 +30,7 @@ private:
 	void HandleReply(QNetworkReply* pReply);
 
 	QNetworkAccessManager m_network;
+	QPointer<QNetworkReply> m_pendingReply;
 	QTimer m_refreshTimer;
 	QTimer m_retryTimer;
 	QUrl m_requestUrl;

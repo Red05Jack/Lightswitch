@@ -41,8 +41,9 @@ Output lands in `bin/linux<arch>/<configuration>/`.
 
 ```ini
 [location]
-latitude=48.1374     ; weather location in degrees
-longitude=11.5755
+name=Graz             ; shown in the settings, presets can be selected on the device
+latitude=47.0707     ; weather location in degrees
+longitude=15.4395
 
 [alarm]
 time=06:45           ; HH:mm, switches the light on
@@ -55,5 +56,10 @@ end=06:00            ; but never while the light is on
 ```
 
 Night mode shows only a dark clock on a black screen; a touch wakes it up.
+
+## Operation
+
+- Tap the Time tile: night mode starts immediately (any touch wakes it up again).
+- Long press the Time tile: global settings for the weather location (preset cities) and night mode (on/off, start and end time). Changes are saved to the configuration file.
 
 Missing or invalid values fall back to these defaults. Weather data comes from [Open-Meteo](https://open-meteo.com/) (no API key needed).

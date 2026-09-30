@@ -12,6 +12,10 @@
 		<file>CalendarTile.qml</file>
 		<file>AlarmTile.qml</file>
 		<file>NightOverlay.qml</file>
+		<file>SettingsButton.qml</file>
+		<file>TimeStepper.qml</file>
+		<file>SettingsPage.qml</file>
+		<file>SettingsScreen.qml</file>
 		<file alias="fonts/Manufaktur-Bold.ttf">../resources/fonts/Manufaktur-Bold.ttf</file>
 		<file alias="fonts/Manufaktur-Heavy.ttf">../resources/fonts/Manufaktur-Heavy.ttf</file>
 	</qresource>

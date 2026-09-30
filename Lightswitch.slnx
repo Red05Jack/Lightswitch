@@ -41,5 +41,8 @@
 		<Project Path="vs/NightModeControllerTest.vcxproj" Id="6f1d2c10-001a-4a10-9a10-00000000001a">
 			<BuildDependency Project="vs/LightswitchCore.vcxproj" />
 		</Project>
+		<Project Path="vs/LocationControllerTest.vcxproj" Id="6f1d2c10-001b-4a10-9a10-00000000001b">
+			<BuildDependency Project="vs/LightswitchCore.vcxproj" />
+		</Project>
 	</Folder>
 </Solution>

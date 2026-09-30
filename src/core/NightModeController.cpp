@@ -2,6 +2,8 @@
 
 namespace {
 constexpr int checkIntervalMilliseconds = 1000;
+constexpr int secondsPerMinute = 60;
+const QString timeFormat = QStringLiteral("HH:mm");
 }
 
 NightModeController::NightModeController(const IClock& clock, ILightController& light, const NightModeSettings& settings, QObject* pParent)
@@ -22,6 +24,21 @@ NightModeController::NightModeController(const IClock& clock, ILightController& 
 // Returns whether the display is currently dark.
 bool NightModeController::IsActive() const {
 	return m_isActive;
+}
+
+// Returns whether night mode may start automatically.
+bool NightModeController::IsEnabled() const {
+	return m_settings.isEnabled;
+}
+
+// Returns the start of the night window as HH:mm.
+QString NightModeController::StartTimeText() const {
+	return m_settings.startTime.toString(timeFormat);
+}
+
+// Returns the end of the night window as HH:mm.
+QString NightModeController::EndTimeText() const {
+	return m_settings.endTime.toString(timeFormat);
 }
 
 // Returns the night mode schedule.
@@ -62,6 +79,28 @@ void NightModeController::Activate() {
 void NightModeController::Wake() {
 	RegisterInput();
 	SetActive(false);
+}
+
+// Enables or disables the automatic start of night mode.
+void NightModeController::SetEnabled(bool isEnabled) {
+	if (m_settings.isEnabled == isEnabled) {
+		return;
+	}
+
+	m_settings.isEnabled = isEnabled;
+	emit SettingsChanged();
+}
+
+// Moves the start of the night window by the given minutes, wrapping around midnight.
+void NightModeController::ShiftStartTime(int minutes) {
+	m_settings.startTime = m_settings.startTime.addSecs(minutes * secondsPerMinute);
+	emit SettingsChanged();
+}
+
+// Moves the end of the night window by the given minutes, wrapping around midnight.
+void NightModeController::ShiftEndTime(int minutes) {
+	m_settings.endTime = m_settings.endTime.addSecs(minutes * secondsPerMinute);
+	emit SettingsChanged();
 }
 
 // Returns whether the time lies between start and end time; an empty window (start equals end) never matches.

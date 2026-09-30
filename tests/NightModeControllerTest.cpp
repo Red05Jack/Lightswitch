@@ -38,6 +38,8 @@ private slots:
 	void WakeDeactivatesAndRestartsIdlePeriod();
 	void LightSwitchedOnWakesDisplay();
 	void EmitsActiveChangedOnlyOnChange();
+	void ShiftsWindowAroundMidnight();
+	void EmitsSettingsChangedOnEdit();
 };
 
 void NightModeControllerTest::ActivatesAfterFiveIdleMinutesInsideWindow() {
@@ -185,6 +187,33 @@ void NightModeControllerTest::EmitsActiveChangedOnlyOnChange() {
 	nightMode.Wake();
 
 	QCOMPARE(spy.count(), 2);
+}
+
+void NightModeControllerTest::ShiftsWindowAroundMidnight() {
+	FakeClock clock(At(12, 0));
+	DummyLightController light;
+	NightModeController nightMode(clock, light, MakeSettings());
+
+	nightMode.ShiftStartTime(150);
+	nightMode.ShiftEndTime(-60);
+
+	QCOMPARE(nightMode.StartTimeText(), QStringLiteral("00:30"));
+	QCOMPARE(nightMode.EndTimeText(), QStringLiteral("05:00"));
+}
+
+void NightModeControllerTest::EmitsSettingsChangedOnEdit() {
+	FakeClock clock(At(12, 0));
+	DummyLightController light;
+	NightModeController nightMode(clock, light, MakeSettings());
+	QSignalSpy spy(&nightMode, &NightModeController::SettingsChanged);
+
+	nightMode.SetEnabled(true);
+	QCOMPARE(spy.count(), 0);
+
+	nightMode.SetEnabled(false);
+	nightMode.ShiftStartTime(5);
+	QCOMPARE(spy.count(), 2);
+	QVERIFY(!nightMode.IsEnabled());
 }
 
 QTEST_GUILESS_MAIN(NightModeControllerTest)
