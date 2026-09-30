@@ -67,3 +67,10 @@ vcpkg_installed/
 # test output & cache
 Testing/
 .cache/
+
+# Project
+bin/
+CMakeUserPresets.json
+.vs/
+*.user
+.superpowers/
