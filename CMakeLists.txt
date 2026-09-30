@@ -18,6 +18,7 @@ add_library(LightswitchCore STATIC
 	src/core/ILightController.cpp
 	src/core/DummyLightController.cpp
 	src/core/AlarmController.cpp
+	src/weather/OpenMeteoParser.cpp
 	src/app/Configuration.cpp
 	src/app/LogConfiguration.cpp
 )
