@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64"><Configuration>Debug</Configuration><Platform>x64</Platform></ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64"><Configuration>Release</Configuration><Platform>x64</Platform></ProjectConfiguration>
+    <ProjectConfiguration Include="DebugLevelLog|x64"><Configuration>DebugLevelLog</Configuration><Platform>x64</Platform></ProjectConfiguration>
+    <ProjectConfiguration Include="ReleaseLevelLog|x64"><Configuration>ReleaseLevelLog</Configuration><Platform>x64</Platform></ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>18.0</VCProjectVersion>
+    <ProjectGuid>{6F1D2C10-0001-4A10-9A10-000000000001}</ProjectGuid>
+    <RootNamespace>LightswitchCore</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <QtModules>Core;Network</QtModules>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>$(DefaultPlatformToolset)</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <Import Project="..\msbuild\Common.props" />
+  <ItemGroup>
+    <ClCompile Include="..\src\core\SystemClock.cpp" />
+    <ClCompile Include="..\src\core\ClockModel.cpp" />
+    <ClCompile Include="..\src\core\ILightController.cpp" />
+    <ClCompile Include="..\src\core\DummyLightController.cpp" />
+    <ClCompile Include="..\src\core\AlarmController.cpp" />
+    <ClCompile Include="..\src\weather\OpenMeteoParser.cpp" />
+    <ClCompile Include="..\src\weather\WeatherModel.cpp" />
+    <ClCompile Include="..\src\weather\WeatherService.cpp" />
+    <ClCompile Include="..\src\calendar\DummyCalendarProvider.cpp" />
+    <ClCompile Include="..\src\calendar\CalendarModel.cpp" />
+    <ClCompile Include="..\src\app\Configuration.cpp" />
+    <ClCompile Include="..\src\app\LogConfiguration.cpp" />
+    <ClCompile Include="..\src\app\AppController.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="..\src\core\ClockModel.h" />
+    <QtMoc Include="..\src\core\ILightController.h" />
+    <QtMoc Include="..\src\core\DummyLightController.h" />
+    <QtMoc Include="..\src\core\AlarmController.h" />
+    <QtMoc Include="..\src\weather\WeatherModel.h" />
+    <QtMoc Include="..\src\weather\WeatherService.h" />
+    <QtMoc Include="..\src\calendar\CalendarModel.h" />
+    <QtMoc Include="..\src\app\AppController.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\core\IClock.h" />
+    <ClInclude Include="..\src\core\SystemClock.h" />
+    <ClInclude Include="..\src\core\AlarmSettings.h" />
+    <ClInclude Include="..\src\weather\WeatherForecast.h" />
+    <ClInclude Include="..\src\weather\OpenMeteoParser.h" />
+    <ClInclude Include="..\src\calendar\CalendarEvent.h" />
+    <ClInclude Include="..\src\calendar\ICalendarProvider.h" />
+    <ClInclude Include="..\src\calendar\DummyCalendarProvider.h" />
+    <ClInclude Include="..\src\app\Configuration.h" />
+    <ClInclude Include="..\src\app\LogConfiguration.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <Import Project="..\msbuild\Qt.targets" />
+</Project>

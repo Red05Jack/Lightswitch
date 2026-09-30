@@ -74,3 +74,4 @@ CMakeUserPresets.json
 .vs/
 *.user
 .superpowers/
+Lightswitch.user.props

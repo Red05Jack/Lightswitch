@@ -5,13 +5,24 @@ Light switch UI for a 720x720 display, built with C++17 and Qt 6 (Qt Quick). Til
 ## Prerequisites
 
 - Qt 6.4 or newer (Core, Network, Gui, Qml, Quick)
-- CMake 3.22 or newer
 - Windows: Visual Studio 2026 (MSVC toolchain)
-- Linux: a C++17 compiler; on apt based systems `./BuildAndRun.sh --install-deps` installs everything
+- Linux: CMake 3.22 or newer and a C++17 compiler; on apt based systems `./BuildAndRun.sh --install-deps` installs everything
 
-## Build and run
+## Windows: Visual Studio 2026 (main build)
 
-Linux:
+`Lightswitch.slnx` is the main build. The projects live in `vs/`, shared settings in `msbuild/`.
+
+1. Tell the projects where Qt is: copy `Lightswitch.user.props.example` to `Lightswitch.user.props` and set `QtRoot` (for example `C:\Qt\6.8.0\msvc2022_64`), or set the `QTDIR` environment variable.
+2. Open `Lightswitch.slnx`, pick a configuration (`Debug`, `Release`, `DebugLevelLog`, `ReleaseLevelLog`, platform `x64`) and build. `Lightswitch` is the startup project.
+3. Run the tests with `./RunTests.ps1 -Configuration Debug` (every test is its own project under the `Tests` folder of the solution).
+
+Command line: `msbuild Lightswitch.slnx /p:Configuration=Release /p:Platform=x64 /m`.
+
+Output lands in `bin/windowsx64/<configuration>/` (`debug`, `release`, `debug_level_log`, `release_level_log`).
+
+## Linux: CMake
+
+CMake reads its source lists and the test list from `Lightswitch.slnx` and the projects in `vs/`, so both builds always compile the same files. To add a source file or test, add it to the Visual Studio project; CMake follows automatically.
 
 ```bash
 ./BuildAndRun.sh                          # debug build, tests, start
@@ -19,19 +30,7 @@ Linux:
 ./BuildAndRun.sh debug_level_log -- --fullscreen
 ```
 
-Windows (Developer PowerShell for VS 2026):
-
-```powershell
-$env:CMAKE_PREFIX_PATH = "C:/Qt/6.8.0/msvc2022_64"   # adjust to your Qt install
-cmake --preset windows-x64
-cmake --build --preset windows-x64-debug
-ctest --test-dir bin/windowsx64/vs -C Debug --output-on-failure
-bin/windowsx64/debug/Lightswitch.exe
-```
-
-Visual Studio 2026 IDE: `./GenerateSolution.ps1 -QtPrefix C:/Qt/6.8.0/msvc2022_64 -Open` configures the project and opens `bin/windowsx64/vs/Lightswitch.slnx`. The solution is generated on purpose and not committed, because CMake writes absolute paths of your machine into it.
-
-Configurations: `debug`, `release`, `debug_level_log`, `release_level_log`. All output lands in `bin/<system><arch>/<configuration>/`.
+Output lands in `bin/linux<arch>/<configuration>/`.
 
 ## Application options
 

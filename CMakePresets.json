@@ -1,42 +1,118 @@
 {
 	"version": 3,
-	"cmakeMinimumRequired": { "major": 3, "minor": 22, "patch": 0 },
+	"cmakeMinimumRequired": {
+		"major": 3,
+		"minor": 22,
+		"patch": 0
+	},
 	"configurePresets": [
 		{
 			"name": "linux-base",
 			"hidden": true,
 			"generator": "Unix Makefiles",
-			"condition": { "type": "equals", "lhs": "${hostSystemName}", "rhs": "Linux" }
+			"condition": {
+				"type": "equals",
+				"lhs": "${hostSystemName}",
+				"rhs": "Linux"
+			}
 		},
-		{ "name": "linux-debug", "inherits": "linux-base", "binaryDir": "${sourceDir}/bin/linuxx64/debug", "cacheVariables": { "CMAKE_BUILD_TYPE": "Debug" } },
-		{ "name": "linux-release", "inherits": "linux-base", "binaryDir": "${sourceDir}/bin/linuxx64/release", "cacheVariables": { "CMAKE_BUILD_TYPE": "Release" } },
-		{ "name": "linux-debug-level-log", "inherits": "linux-base", "binaryDir": "${sourceDir}/bin/linuxx64/debug_level_log", "cacheVariables": { "CMAKE_BUILD_TYPE": "DebugLevelLog" } },
-		{ "name": "linux-release-level-log", "inherits": "linux-base", "binaryDir": "${sourceDir}/bin/linuxx64/release_level_log", "cacheVariables": { "CMAKE_BUILD_TYPE": "ReleaseLevelLog" } },
-		{ "name": "linux-arm64-debug", "inherits": "linux-base", "binaryDir": "${sourceDir}/bin/linuxarm64/debug", "cacheVariables": { "CMAKE_BUILD_TYPE": "Debug" } },
-		{ "name": "linux-arm64-release", "inherits": "linux-base", "binaryDir": "${sourceDir}/bin/linuxarm64/release", "cacheVariables": { "CMAKE_BUILD_TYPE": "Release" } },
-		{ "name": "linux-arm64-debug-level-log", "inherits": "linux-base", "binaryDir": "${sourceDir}/bin/linuxarm64/debug_level_log", "cacheVariables": { "CMAKE_BUILD_TYPE": "DebugLevelLog" } },
-		{ "name": "linux-arm64-release-level-log", "inherits": "linux-base", "binaryDir": "${sourceDir}/bin/linuxarm64/release_level_log", "cacheVariables": { "CMAKE_BUILD_TYPE": "ReleaseLevelLog" } },
 		{
-			"name": "windows-x64",
-			"generator": "Visual Studio 18 2026",
-			"architecture": { "value": "x64", "strategy": "set" },
-			"binaryDir": "${sourceDir}/bin/windowsx64/vs",
-			"condition": { "type": "equals", "lhs": "${hostSystemName}", "rhs": "Windows" },
-			"cacheVariables": { "CMAKE_CONFIGURATION_TYPES": "Debug;Release;DebugLevelLog;ReleaseLevelLog" }
+			"name": "linux-debug",
+			"inherits": "linux-base",
+			"binaryDir": "${sourceDir}/bin/linuxx64/debug",
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Debug"
+			}
+		},
+		{
+			"name": "linux-release",
+			"inherits": "linux-base",
+			"binaryDir": "${sourceDir}/bin/linuxx64/release",
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Release"
+			}
+		},
+		{
+			"name": "linux-debug-level-log",
+			"inherits": "linux-base",
+			"binaryDir": "${sourceDir}/bin/linuxx64/debug_level_log",
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "DebugLevelLog"
+			}
+		},
+		{
+			"name": "linux-release-level-log",
+			"inherits": "linux-base",
+			"binaryDir": "${sourceDir}/bin/linuxx64/release_level_log",
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "ReleaseLevelLog"
+			}
+		},
+		{
+			"name": "linux-arm64-debug",
+			"inherits": "linux-base",
+			"binaryDir": "${sourceDir}/bin/linuxarm64/debug",
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Debug"
+			}
+		},
+		{
+			"name": "linux-arm64-release",
+			"inherits": "linux-base",
+			"binaryDir": "${sourceDir}/bin/linuxarm64/release",
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Release"
+			}
+		},
+		{
+			"name": "linux-arm64-debug-level-log",
+			"inherits": "linux-base",
+			"binaryDir": "${sourceDir}/bin/linuxarm64/debug_level_log",
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "DebugLevelLog"
+			}
+		},
+		{
+			"name": "linux-arm64-release-level-log",
+			"inherits": "linux-base",
+			"binaryDir": "${sourceDir}/bin/linuxarm64/release_level_log",
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "ReleaseLevelLog"
+			}
 		}
 	],
 	"buildPresets": [
-		{ "name": "linux-debug", "configurePreset": "linux-debug" },
-		{ "name": "linux-release", "configurePreset": "linux-release" },
-		{ "name": "linux-debug-level-log", "configurePreset": "linux-debug-level-log" },
-		{ "name": "linux-release-level-log", "configurePreset": "linux-release-level-log" },
-		{ "name": "linux-arm64-debug", "configurePreset": "linux-arm64-debug" },
-		{ "name": "linux-arm64-release", "configurePreset": "linux-arm64-release" },
-		{ "name": "linux-arm64-debug-level-log", "configurePreset": "linux-arm64-debug-level-log" },
-		{ "name": "linux-arm64-release-level-log", "configurePreset": "linux-arm64-release-level-log" },
-		{ "name": "windows-x64-debug", "configurePreset": "windows-x64", "configuration": "Debug" },
-		{ "name": "windows-x64-release", "configurePreset": "windows-x64", "configuration": "Release" },
-		{ "name": "windows-x64-debug-level-log", "configurePreset": "windows-x64", "configuration": "DebugLevelLog" },
-		{ "name": "windows-x64-release-level-log", "configurePreset": "windows-x64", "configuration": "ReleaseLevelLog" }
+		{
+			"name": "linux-debug",
+			"configurePreset": "linux-debug"
+		},
+		{
+			"name": "linux-release",
+			"configurePreset": "linux-release"
+		},
+		{
+			"name": "linux-debug-level-log",
+			"configurePreset": "linux-debug-level-log"
+		},
+		{
+			"name": "linux-release-level-log",
+			"configurePreset": "linux-release-level-log"
+		},
+		{
+			"name": "linux-arm64-debug",
+			"configurePreset": "linux-arm64-debug"
+		},
+		{
+			"name": "linux-arm64-release",
+			"configurePreset": "linux-arm64-release"
+		},
+		{
+			"name": "linux-arm64-debug-level-log",
+			"configurePreset": "linux-arm64-debug-level-log"
+		},
+		{
+			"name": "linux-arm64-release-level-log",
+			"configurePreset": "linux-arm64-release-level-log"
+		}
 	]
 }

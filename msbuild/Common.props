@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Shared settings of all Lightswitch projects: configurations, output layout
+  bin\windowsx64\<configuration>\, C++17 and the Qt include and library paths.
+  Imported by every .vcxproj after Microsoft.Cpp.props. The project must define
+  <QtModules> (for example Core;Network) before importing this file.
+-->
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <!-- Optional machine-local settings (for example QtRoot), not committed. -->
+  <Import Project="$(MSBuildThisFileDirectory)..\Lightswitch.user.props"
+          Condition="Exists('$(MSBuildThisFileDirectory)..\Lightswitch.user.props')" />
+
+  <PropertyGroup>
+    <RepositoryRoot>$([MSBuild]::NormalizeDirectory('$(MSBuildThisFileDirectory)', '..'))</RepositoryRoot>
+    <QtRoot Condition="'$(QtRoot)' == ''">$(QTDIR)</QtRoot>
+    <QtRoot Condition="'$(QtRoot)' == ''">$(CMAKE_PREFIX_PATH)</QtRoot>
+    <QtRoot Condition="'$(QtRoot)' != ''">$([MSBuild]::EnsureTrailingSlash('$(QtRoot)'))</QtRoot>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <ConfigurationDirectory Condition="'$(Configuration)' == 'Debug'">debug</ConfigurationDirectory>
+    <ConfigurationDirectory Condition="'$(Configuration)' == 'Release'">release</ConfigurationDirectory>
+    <ConfigurationDirectory Condition="'$(Configuration)' == 'DebugLevelLog'">debug_level_log</ConfigurationDirectory>
+    <ConfigurationDirectory Condition="'$(Configuration)' == 'ReleaseLevelLog'">release_level_log</ConfigurationDirectory>
+
+    <IsDebugLike Condition="'$(Configuration)' == 'Debug' or '$(Configuration)' == 'DebugLevelLog'">true</IsDebugLike>
+    <IsDebugLike Condition="'$(IsDebugLike)' == ''">false</IsDebugLike>
+    <QtLibrarySuffix Condition="'$(IsDebugLike)' == 'true'">d</QtLibrarySuffix>
+
+    <!-- 0 = no debug output, 2 = default, 3 = verbose. Independent of the optimization settings. -->
+    <LogLevel Condition="'$(Configuration)' == 'Debug'">2</LogLevel>
+    <LogLevel Condition="'$(Configuration)' == 'Release'">0</LogLevel>
+    <LogLevel Condition="'$(Configuration)' == 'DebugLevelLog' or '$(Configuration)' == 'ReleaseLevelLog'">3</LogLevel>
+
+    <OutDir>$(RepositoryRoot)bin\windowsx64\$(ConfigurationDirectory)\</OutDir>
+    <IntDir>$(RepositoryRoot)bin\windowsx64\$(ConfigurationDirectory)\obj\$(ProjectName)\</IntDir>
+    <QtGeneratedDirectory>$(IntDir)qtgen\</QtGeneratedDirectory>
+
+    <!-- Include directories of all used Qt modules are always added; libraries only for the requested modules. -->
+    <QtModuleIncludes>$(QtRoot)include\QtCore;$(QtRoot)include\QtNetwork;$(QtRoot)include\QtGui;$(QtRoot)include\QtQml;$(QtRoot)include\QtQuick;$(QtRoot)include\QtTest</QtModuleIncludes>
+    <QtModuleLibraries Condition="$(QtModules.Contains('Core'))">$(QtModuleLibraries);Qt6Core$(QtLibrarySuffix).lib</QtModuleLibraries>
+    <QtModuleLibraries Condition="$(QtModules.Contains('Network'))">$(QtModuleLibraries);Qt6Network$(QtLibrarySuffix).lib</QtModuleLibraries>
+    <QtModuleLibraries Condition="$(QtModules.Contains('Gui'))">$(QtModuleLibraries);Qt6Gui$(QtLibrarySuffix).lib</QtModuleLibraries>
+    <QtModuleLibraries Condition="$(QtModules.Contains('Qml'))">$(QtModuleLibraries);Qt6Qml$(QtLibrarySuffix).lib</QtModuleLibraries>
+    <QtModuleLibraries Condition="$(QtModules.Contains('Quick'))">$(QtModuleLibraries);Qt6Quick$(QtLibrarySuffix).lib</QtModuleLibraries>
+    <QtModuleLibraries Condition="$(QtModules.Contains('Test'))">$(QtModuleLibraries);Qt6Test$(QtLibrarySuffix).lib</QtModuleLibraries>
+    <ProjectIncludes>$(RepositoryRoot)src\core;$(RepositoryRoot)src\weather;$(RepositoryRoot)src\calendar;$(RepositoryRoot)src\app</ProjectIncludes>
+  </PropertyGroup>
+
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <ConformanceMode>true</ConformanceMode>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalOptions>/Zc:__cplusplus /utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalIncludeDirectories>$(ProjectIncludes);$(QtGeneratedDirectory);$(QtRoot)include;$(QtModuleIncludes);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>LIGHTSWITCH_LOG_LEVEL=$(LogLevel);WIN32;_WINDOWS;UNICODE;_UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(QtRoot)lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(QtModuleLibraries);%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+
+  <ItemDefinitionGroup Condition="'$(IsDebugLike)' == 'true'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+    </ClCompile>
+  </ItemDefinitionGroup>
+
+  <ItemDefinitionGroup Condition="'$(IsDebugLike)' == 'false'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>NDEBUG;QT_NO_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+</Project>

@@ -1,0 +1,42 @@
+<Solution>
+	<Configurations>
+		<BuildType Name="Debug" />
+		<BuildType Name="DebugLevelLog" />
+		<BuildType Name="Release" />
+		<BuildType Name="ReleaseLevelLog" />
+		<Platform Name="x64" />
+	</Configurations>
+	<Project Path="vs/Lightswitch.vcxproj">
+		<BuildDependency Project="vs/LightswitchCore.vcxproj" />
+	</Project>
+	<Project Path="vs/LightswitchCore.vcxproj" />
+	<Folder Name="/Tests/">
+		<Project Path="vs/ClockModelTest.vcxproj">
+			<BuildDependency Project="vs/LightswitchCore.vcxproj" />
+		</Project>
+		<Project Path="vs/DummyLightControllerTest.vcxproj">
+			<BuildDependency Project="vs/LightswitchCore.vcxproj" />
+		</Project>
+		<Project Path="vs/AlarmControllerTest.vcxproj">
+			<BuildDependency Project="vs/LightswitchCore.vcxproj" />
+		</Project>
+		<Project Path="vs/ConfigurationTest.vcxproj">
+			<BuildDependency Project="vs/LightswitchCore.vcxproj" />
+		</Project>
+		<Project Path="vs/OpenMeteoParserTest.vcxproj">
+			<BuildDependency Project="vs/LightswitchCore.vcxproj" />
+		</Project>
+		<Project Path="vs/WeatherServiceTest.vcxproj">
+			<BuildDependency Project="vs/LightswitchCore.vcxproj" />
+		</Project>
+		<Project Path="vs/WeatherModelTest.vcxproj">
+			<BuildDependency Project="vs/LightswitchCore.vcxproj" />
+		</Project>
+		<Project Path="vs/DummyCalendarProviderTest.vcxproj">
+			<BuildDependency Project="vs/LightswitchCore.vcxproj" />
+		</Project>
+		<Project Path="vs/CalendarModelTest.vcxproj">
+			<BuildDependency Project="vs/LightswitchCore.vcxproj" />
+		</Project>
+	</Folder>
+</Solution>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Qt code generation for plain MSBuild projects. Imported after Microsoft.Cpp.targets.
+    QtMoc         header with Q_OBJECT      -> moc_<name>.cpp, compiled into the project
+    QtMocInclude  .cpp that includes <name>.moc -> <name>.moc in the generated directory
+    QtRcc         .qrc resource collection    -> qrc_<name>.cpp, compiled into the project
+-->
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <QtMocExecutable>$(QtRoot)bin\moc.exe</QtMocExecutable>
+    <QtRccExecutable>$(QtRoot)bin\rcc.exe</QtRccExecutable>
+    <QtMocIncludeArguments>-I"$(RepositoryRoot)src\core" -I"$(RepositoryRoot)src\weather" -I"$(RepositoryRoot)src\calendar" -I"$(RepositoryRoot)src\app"</QtMocIncludeArguments>
+  </PropertyGroup>
+
+  <Target Name="QtCheckRoot">
+    <Error Condition="'$(QtRoot)' == '' or !Exists('$(QtMocExecutable)')"
+           Text="Qt 6 was not found. Set the QTDIR environment variable or create Lightswitch.user.props with QtRoot (see README)." />
+  </Target>
+
+  <Target Name="QtRunMoc" BeforeTargets="ClCompile" DependsOnTargets="QtCheckRoot"
+          Inputs="%(QtMoc.FullPath)" Outputs="$(QtGeneratedDirectory)moc_%(QtMoc.Filename).cpp"
+          Condition="'@(QtMoc)' != ''">
+    <MakeDir Directories="$(QtGeneratedDirectory)" />
+    <Exec Command="&quot;$(QtMocExecutable)&quot; $(QtMocIncludeArguments) -o &quot;$(QtGeneratedDirectory)moc_%(QtMoc.Filename).cpp&quot; &quot;%(QtMoc.FullPath)&quot;" />
+  </Target>
+
+  <Target Name="QtRunMocInclude" BeforeTargets="ClCompile" DependsOnTargets="QtCheckRoot"
+          Inputs="%(QtMocInclude.FullPath)" Outputs="$(QtGeneratedDirectory)%(QtMocInclude.Filename).moc"
+          Condition="'@(QtMocInclude)' != ''">
+    <MakeDir Directories="$(QtGeneratedDirectory)" />
+    <Exec Command="&quot;$(QtMocExecutable)&quot; $(QtMocIncludeArguments) -o &quot;$(QtGeneratedDirectory)%(QtMocInclude.Filename).moc&quot; &quot;%(QtMocInclude.FullPath)&quot;" />
+  </Target>
+
+  <Target Name="QtRunRcc" BeforeTargets="ClCompile" DependsOnTargets="QtCheckRoot"
+          Inputs="%(QtRcc.FullPath);@(QtRccDependency)" Outputs="$(QtGeneratedDirectory)qrc_%(QtRcc.Filename).cpp"
+          Condition="'@(QtRcc)' != ''">
+    <MakeDir Directories="$(QtGeneratedDirectory)" />
+    <Exec Command="&quot;$(QtRccExecutable)&quot; --name %(QtRcc.Filename) -o &quot;$(QtGeneratedDirectory)qrc_%(QtRcc.Filename).cpp&quot; &quot;%(QtRcc.FullPath)&quot;" />
+  </Target>
+
+  <Target Name="QtAddGeneratedSources" BeforeTargets="ClCompile" DependsOnTargets="QtRunMoc;QtRunMocInclude;QtRunRcc">
+    <ItemGroup>
+      <ClCompile Include="@(QtMoc->'$(QtGeneratedDirectory)moc_%(Filename).cpp')" />
+      <ClCompile Include="@(QtRcc->'$(QtGeneratedDirectory)qrc_%(Filename).cpp')" />
+    </ItemGroup>
+  </Target>
+</Project>

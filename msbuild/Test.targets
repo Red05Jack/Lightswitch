@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copies the Qt runtime a QtTest executable needs next to it so that it starts without PATH changes. -->
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Target Name="QtCopyTestRuntime" AfterTargets="Build" DependsOnTargets="QtCheckRoot">
+    <ItemGroup>
+      <QtRuntimeFile Include="$(QtRoot)bin\Qt6Core$(QtLibrarySuffix).dll;$(QtRoot)bin\Qt6Network$(QtLibrarySuffix).dll;$(QtRoot)bin\Qt6Test$(QtLibrarySuffix).dll" />
+    </ItemGroup>
+    <Copy SourceFiles="@(QtRuntimeFile)" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true" />
+  </Target>
+</Project>

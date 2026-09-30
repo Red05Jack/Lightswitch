@@ -1,7 +1,10 @@
+# Linux build entry. On Windows, Lightswitch.slnx (Visual Studio 2026) is the main build;
+# this file reads its file lists from the solution projects so both stay identical.
 cmake_minimum_required(VERSION 3.22)
 project(Lightswitch VERSION 0.1.0 LANGUAGES CXX)
 
 include(cmake/BuildLayout.cmake)
+include(cmake/VisualStudioProject.cmake)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -12,21 +15,8 @@ qt_standard_project_setup()
 
 get_filename_component(LIGHTSWITCH_QT_BIN_DIR "${Qt6_DIR}/../../../bin" ABSOLUTE)
 
-add_library(LightswitchCore STATIC
-	src/core/SystemClock.cpp
-	src/core/ClockModel.cpp
-	src/core/ILightController.cpp
-	src/core/DummyLightController.cpp
-	src/core/AlarmController.cpp
-	src/weather/OpenMeteoParser.cpp
-	src/weather/WeatherModel.cpp
-	src/weather/WeatherService.cpp
-	src/calendar/DummyCalendarProvider.cpp
-	src/calendar/CalendarModel.cpp
-	src/app/Configuration.cpp
-	src/app/LogConfiguration.cpp
-	src/app/AppController.cpp
-)
+lightswitch_read_project_items("${CMAKE_SOURCE_DIR}/vs/LightswitchCore.vcxproj" ClCompile LIGHTSWITCH_CORE_SOURCES)
+add_library(LightswitchCore STATIC ${LIGHTSWITCH_CORE_SOURCES})
 target_include_directories(LightswitchCore PUBLIC
 	src/core
 	src/weather
@@ -39,13 +29,11 @@ target_compile_definitions(LightswitchCore PUBLIC ${LIGHTSWITCH_LOG_LEVEL_DEFINI
 enable_testing()
 add_subdirectory(tests)
 
-add_subdirectory(qml)
-
-qt_add_executable(Lightswitch src/app/main.cpp)
+lightswitch_read_project_items("${CMAKE_SOURCE_DIR}/vs/Lightswitch.vcxproj" ClCompile LIGHTSWITCH_APP_SOURCES)
+lightswitch_read_project_items("${CMAKE_SOURCE_DIR}/vs/Lightswitch.vcxproj" QtRcc LIGHTSWITCH_APP_RESOURCES)
+qt_add_executable(Lightswitch ${LIGHTSWITCH_APP_SOURCES} ${LIGHTSWITCH_APP_RESOURCES})
 target_link_libraries(Lightswitch PRIVATE
 	LightswitchCore
-	LightswitchUi
-	LightswitchUiplugin
 	Qt6::Gui
 	Qt6::Qml
 	Qt6::Quick
