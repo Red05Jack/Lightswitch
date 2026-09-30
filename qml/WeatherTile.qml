@@ -16,7 +16,7 @@ Tile {
 	TileText {
 		x: 12.3
 		baselineY: 205
-		isBlack: true
+		isHeavy: true
 		font.pixelSize: Theme.valueSize
 		color: Theme.value
 		text: app.weather.temperatureText
@@ -25,7 +25,7 @@ Tile {
 	TileText {
 		x: 208 - width
 		baselineY: 205
-		isBlack: true
+		isHeavy: true
 		font.pixelSize: Theme.valueSize
 		color: Theme.value
 		text: app.weather.precipitationText

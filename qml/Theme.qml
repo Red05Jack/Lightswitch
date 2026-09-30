@@ -17,7 +17,7 @@ QtObject {
 	readonly property int heroSize: 133
 
 	readonly property FontLoader boldLoader: FontLoader { source: "fonts/Manufaktur-Bold.ttf" }
-	readonly property FontLoader blackLoader: FontLoader { source: "fonts/Manufaktur-Black.ttf" }
+	readonly property FontLoader heavyLoader: FontLoader { source: "fonts/Manufaktur-Heavy.ttf" }
 	readonly property string boldFamily: boldLoader.name
-	readonly property string blackFamily: blackLoader.name
+	readonly property string heavyFamily: heavyLoader.name
 }

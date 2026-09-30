@@ -11,7 +11,7 @@ Tile {
 	TileText {
 		x: 6.2
 		baselineY: 391.7
-		isBlack: true
+		isHeavy: true
 		font.pixelSize: Theme.heroSize
 		color: app.light.isOn ? Theme.accent : Theme.label
 		text: app.light.isOn ? "ON" : "OFF"

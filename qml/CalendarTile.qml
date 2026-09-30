@@ -11,7 +11,7 @@ Tile {
 		x: 12.3
 		width: 196
 		baselineY: 104.6
-		isBlack: true
+		isHeavy: true
 		font.pixelSize: Theme.valueSize
 		color: Theme.value
 		wrapMode: Text.Wrap

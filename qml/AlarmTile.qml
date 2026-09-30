@@ -10,7 +10,7 @@ Tile {
 	TileText {
 		x: 12.3
 		baselineY: 124.6
-		isBlack: true
+		isHeavy: true
 		font.pixelSize: Theme.valueSize
 		color: Theme.value
 		text: app.alarm.timeText
