@@ -15,7 +15,9 @@ class WeatherService : public QObject {
 
 public:
 	WeatherService(double latitude, double longitude, QObject* pParent = nullptr);
+	explicit WeatherService(const QUrl& requestUrl, QObject* pParent = nullptr);
 
+	void SetRetryInterval(int milliseconds);
 	void Start();
 	void Refresh();
 
@@ -27,5 +29,6 @@ private:
 
 	QNetworkAccessManager m_network;
 	QTimer m_refreshTimer;
+	QTimer m_retryTimer;
 	QUrl m_requestUrl;
 };

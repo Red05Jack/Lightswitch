@@ -38,9 +38,13 @@ foreach(_linkerKind EXE SHARED MODULE STATIC)
 	set(CMAKE_${_linkerKind}_LINKER_FLAGS_RELEASELEVELLOG "${CMAKE_${_linkerKind}_LINKER_FLAGS_RELEASE}" CACHE STRING "" FORCE)
 endforeach()
 
-# Qt only ships Debug and Release libraries.
-set(CMAKE_MAP_IMPORTED_CONFIG_DEBUGLEVELLOG Debug Release)
-set(CMAKE_MAP_IMPORTED_CONFIG_RELEASELEVELLOG Release)
+# Qt only ships Debug and Release libraries. Single-config generators fall back to the
+# available imported configuration on their own; a mapping there would make imported targets
+# without per-config locations (for example OpenGL::GL on Linux) unusable.
+if(_isMultiConfig)
+	set(CMAKE_MAP_IMPORTED_CONFIG_DEBUGLEVELLOG Debug Release)
+	set(CMAKE_MAP_IMPORTED_CONFIG_RELEASELEVELLOG Release)
+endif()
 
 # MSVC: debug-like configurations must use the debug runtime to match the Qt debug libraries.
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug,DebugLevelLog>:Debug>DLL")

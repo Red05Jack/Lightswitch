@@ -44,7 +44,7 @@ Lightswitch/
 ## Design-Vorlage (aus der SVG)
 
 - Canvas 720x720, Hintergrund schwarz.
-- Kacheln: Fuellung `#241F23`, Rand `#2D2B2E`; Weather-Kachel Fuellung `#1F493B`,
+- Kacheln: Fuellung `#241F23`, Rand `#2D2B2E`; Light-Kachel (gruen) Fuellung `#1F493B`,
   Rand `#3C4E50`.
 - Akzent `#CA6F54` (aktive Punkte, ON, aktive Wochentage), Labels `#999999`,
   Werte `#EDEDED`, leere Punkte `#2D2B2E`.
