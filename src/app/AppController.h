@@ -5,6 +5,7 @@
 #include "ClockModel.h"
 #include "Configuration.h"
 #include "DummyCalendarProvider.h"
+#include "GoogleCalendarProvider.h"
 #include "DummyLightController.h"
 #include "InputActivityMonitor.h"
 #include "LocationController.h"
@@ -14,8 +15,11 @@
 #include "WeatherService.h"
 
 #include <QObject>
+#include <QUrl>
 #include <QString>
 #include <QTimer>
+
+#include <memory>
 
 // Owns and wires all models and services, persists changed settings and exposes everything to the QML user interface.
 class AppController : public QObject {
@@ -45,7 +49,12 @@ public:
 
 	void Start();
 
+signals:
+	void OpenUrlRequested(const QUrl& url);
+
 private:
+	static std::unique_ptr<ICalendarProvider> CreateCalendarProvider(const QString& configurationPath, GoogleCalendarProvider*& pGoogleProvider);
+
 	void SaveConfiguration();
 
 	Configuration m_configuration;
@@ -60,7 +69,8 @@ private:
 	LocationController m_locationController;
 	WeatherModel m_weatherModel;
 	WeatherService m_weatherService;
-	DummyCalendarProvider m_calendarProvider;
+	GoogleCalendarProvider* m_pGoogleProvider = nullptr;
+	std::unique_ptr<ICalendarProvider> m_calendarProvider;
 	CalendarModel m_calendarModel;
 	bool m_isFullscreen;
 };

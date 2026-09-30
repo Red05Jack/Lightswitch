@@ -4,6 +4,7 @@
 
 #include <QCommandLineOption>
 #include <QCommandLineParser>
+#include <QDesktopServices>
 #include <QDir>
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
@@ -29,6 +30,7 @@ int main(int argc, char* argv[]) {
 	const Configuration configuration = Configuration::Load(configurationPath);
 	AppController controller(configuration, configurationPath, parser.isSet(fullscreenOption));
 
+	QObject::connect(&controller, &AppController::OpenUrlRequested, &application, [](const QUrl& url) { QDesktopServices::openUrl(url); });
 	application.installEventFilter(&controller.InputMonitor());
 
 	QQmlApplicationEngine engine;

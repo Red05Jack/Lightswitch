@@ -27,4 +27,11 @@ Tile {
 		baselineY: 205
 		text: app.calendar.whenText
 	}
+
+	// Starts linking the Google account while it is not linked yet.
+	MouseArea {
+		anchors.fill: parent
+		enabled: app.calendar.needsLinking
+		onClicked: app.calendar.BeginLinking()
+	}
 }

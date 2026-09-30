@@ -75,3 +75,5 @@ CMakeUserPresets.json
 *.user
 .superpowers/
 Lightswitch.user.props
+google.ini
+google-token.ini

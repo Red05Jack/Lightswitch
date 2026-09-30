@@ -12,10 +12,17 @@ public:
 
 	QList<CalendarEvent> UpcomingEvents(const QDateTime&) const override { return m_events; }
 
+	bool NeedsLinking() const override { return m_needsLinking; }
+	void BeginLinking() override { m_linkingStarted = true; }
+
 	void SetEvents(const QList<CalendarEvent>& events) { m_events = events; }
+	void SetNeedsLinking(bool needsLinking) { m_needsLinking = needsLinking; }
+	bool WasLinkingStarted() const { return m_linkingStarted; }
 
 private:
 	QList<CalendarEvent> m_events;
+	bool m_needsLinking = false;
+	bool m_linkingStarted = false;
 };
 }
 
@@ -26,6 +33,8 @@ private slots:
 	void ShowsNextEvent();
 	void ShowsPlaceholderWithoutEvents();
 	void RefreshUpdatesAndEmitsChanged();
+	void ShowsDateOnlyForAllDayEvents();
+	void AsksToLinkAccount();
 };
 
 void CalendarModelTest::ShowsNextEvent() {
@@ -61,6 +70,38 @@ void CalendarModelTest::RefreshUpdatesAndEmitsChanged() {
 	model.Refresh();
 	QCOMPARE(spy.count(), 1);
 	QCOMPARE(model.TitleText(), QStringLiteral("Gym"));
+}
+
+void CalendarModelTest::ShowsDateOnlyForAllDayEvents() {
+	FakeClock clock(QDateTime(QDate(2026, 9, 30), QTime(12, 0)));
+	CalendarEvent event;
+	event.title = QStringLiteral("Holiday");
+	event.start = QDateTime(QDate(2026, 10, 3), QTime(0, 0));
+	event.isAllDay = true;
+	StubCalendarProvider provider({event});
+
+	const CalendarModel model(provider, clock);
+
+	QCOMPARE(model.WhenText(), QStringLiteral("03.10.2026"));
+}
+
+void CalendarModelTest::AsksToLinkAccount() {
+	FakeClock clock(QDateTime(QDate(2026, 9, 30), QTime(12, 0)));
+	StubCalendarProvider provider({});
+	provider.SetNeedsLinking(true);
+	CalendarModel model(provider, clock);
+	QSignalSpy spy(&model, &CalendarModel::Changed);
+
+	QVERIFY(model.NeedsLinking());
+	QCOMPARE(model.TitleText(), QStringLiteral("Link Google"));
+
+	model.BeginLinking();
+	QVERIFY(provider.WasLinkingStarted());
+
+	provider.SetNeedsLinking(false);
+	model.Refresh();
+	QCOMPARE(model.TitleText(), QStringLiteral("No events"));
+	QCOMPARE(spy.count(), 1);
 }
 
 QTEST_GUILESS_MAIN(CalendarModelTest)

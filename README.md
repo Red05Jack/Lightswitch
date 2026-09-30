@@ -1,6 +1,6 @@
 # Lightswitch
 
-Light switch UI for a 720x720 display, built with C++17 and Qt 6 (Qt Quick). Tiles: Time, Light, Weather (rain forecast of the next 24 hours as a 12x5 dot matrix), Calendar (dummy events for now) and Alarm (switches the light on at a set time).
+Light switch UI for a 720x720 display, built with C++17 and Qt 6 (Qt Quick). Tiles: Time, Light, Weather (rain forecast of the next 24 hours as a 12x5 dot matrix), Calendar (Google Calendar, or dummy events without credentials) and Alarm (switches the light on at a set time).
 
 ## Prerequisites
 
@@ -64,5 +64,15 @@ Night mode shows only a dark clock on a black screen; a touch wakes it up.
 - Tap the Time tile: night mode starts immediately (any touch wakes it up again).
 - Long press the Alarm tile: alarm settings with the global switch and an on/off flag and time for each weekday. The tile shows the time of the next alarm (OFF when none).
 - Long press the Time tile: global settings for the weather location (preset cities) and night mode (on/off, start and end time). Changes are saved to the configuration file.
+
+## Google Calendar
+
+The Calendar tile shows the next event of the primary Google calendar within the next 7 days (all-day events show only the date). Without Google credentials it shows random dummy events.
+
+1. In the [Google Cloud Console](https://console.cloud.google.com/) enable the Google Calendar API and create an OAuth client of type **Desktop app** (add your account as test user while the consent screen is in testing mode).
+2. Copy `config/google.ini.example` to `google.ini` next to `lightswitch.ini` and enter the client id and secret. The file is git-ignored.
+3. Start the app and tap the Calendar tile ("Link Google"). The Google sign-in opens in the default browser **on the same machine** (the address is also written to the log); after granting read access the refresh token is stored in `google-token.ini` next to the configuration file.
+
+Google does not allow the calendar scope for the device code flow, so the one-time sign-in needs a browser on the machine running the app. For a headless device, link it once on a PC and copy `google-token.ini` (and `google.ini`) next to the device's `lightswitch.ini`.
 
 Missing or invalid values fall back to these defaults. Weather data comes from [Open-Meteo](https://open-meteo.com/) (no API key needed).

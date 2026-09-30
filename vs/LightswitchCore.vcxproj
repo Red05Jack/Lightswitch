@@ -34,6 +34,10 @@
     <ClCompile Include="..\src\weather\WeatherService.cpp" />
     <ClCompile Include="..\src\calendar\DummyCalendarProvider.cpp" />
     <ClCompile Include="..\src\calendar\CalendarModel.cpp" />
+    <ClCompile Include="..\src\calendar\GoogleCredentials.cpp" />
+    <ClCompile Include="..\src\calendar\GoogleCalendarParser.cpp" />
+    <ClCompile Include="..\src\calendar\GoogleAuthorizer.cpp" />
+    <ClCompile Include="..\src\calendar\GoogleCalendarProvider.cpp" />
     <ClCompile Include="..\src\app\Configuration.cpp" />
     <ClCompile Include="..\src\app\LogConfiguration.cpp" />
     <ClCompile Include="..\src\app\InputActivityMonitor.cpp" />
@@ -49,6 +53,8 @@
     <QtMoc Include="..\src\weather\WeatherModel.h" />
     <QtMoc Include="..\src\weather\WeatherService.h" />
     <QtMoc Include="..\src\calendar\CalendarModel.h" />
+    <QtMoc Include="..\src\calendar\GoogleAuthorizer.h" />
+    <QtMoc Include="..\src\calendar\GoogleCalendarProvider.h" />
     <QtMoc Include="..\src\app\InputActivityMonitor.h" />
     <QtMoc Include="..\src\app\AppController.h" />
   </ItemGroup>
@@ -63,6 +69,8 @@
     <ClInclude Include="..\src\calendar\CalendarEvent.h" />
     <ClInclude Include="..\src\calendar\ICalendarProvider.h" />
     <ClInclude Include="..\src\calendar\DummyCalendarProvider.h" />
+    <ClInclude Include="..\src\calendar\GoogleCredentials.h" />
+    <ClInclude Include="..\src\calendar\GoogleCalendarParser.h" />
     <ClInclude Include="..\src\app\Configuration.h" />
     <ClInclude Include="..\src\app\LogConfiguration.h" />
   </ItemGroup>
