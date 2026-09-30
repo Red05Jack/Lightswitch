@@ -10,3 +10,4 @@ function(add_lightswitch_test name)
 endfunction()
 
 add_lightswitch_test(ClockModelTest)
+add_lightswitch_test(DummyLightControllerTest)

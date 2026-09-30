@@ -15,6 +15,8 @@ get_filename_component(LIGHTSWITCH_QT_BIN_DIR "${Qt6_DIR}/../../../bin" ABSOLUTE
 add_library(LightswitchCore STATIC
 	src/core/SystemClock.cpp
 	src/core/ClockModel.cpp
+	src/core/ILightController.cpp
+	src/core/DummyLightController.cpp
 )
 target_include_directories(LightswitchCore PUBLIC
 	src/core
