@@ -20,6 +20,7 @@ add_library(LightswitchCore STATIC
 	src/core/AlarmController.cpp
 	src/weather/OpenMeteoParser.cpp
 	src/weather/WeatherModel.cpp
+	src/weather/WeatherService.cpp
 	src/app/Configuration.cpp
 	src/app/LogConfiguration.cpp
 )
