@@ -21,6 +21,8 @@ add_library(LightswitchCore STATIC
 	src/weather/OpenMeteoParser.cpp
 	src/weather/WeatherModel.cpp
 	src/weather/WeatherService.cpp
+	src/calendar/DummyCalendarProvider.cpp
+	src/calendar/CalendarModel.cpp
 	src/app/Configuration.cpp
 	src/app/LogConfiguration.cpp
 )
