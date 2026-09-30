@@ -4,7 +4,7 @@ Qt 6 / C++17 light switch UI for a 720x720 display. Design spec: `docs/superpowe
 
 ## Commands
 - Linux: `./BuildAndRun.sh [debug|release|debug_level_log|release_level_log] [--clean] [--no-test] [--no-run] [-j N] [-- app args]`
-- Windows (Developer PowerShell for VS 2026, Qt via `$env:CMAKE_PREFIX_PATH`, e.g. `C:/Qt/6.8.0/msvc2022_64`): `cmake --preset windows-x64`, `cmake --build --preset windows-x64-debug`, `ctest --test-dir bin/windowsx64/vs -C Debug --output-on-failure`. Solution file: `bin/windowsx64/vs/Lightswitch.sln`.
+- Windows (Developer PowerShell for VS 2026, Qt via `$env:CMAKE_PREFIX_PATH`, e.g. `C:/Qt/6.8.0/msvc2022_64`): `cmake --preset windows-x64`, `cmake --build --preset windows-x64-debug`, `ctest --test-dir bin/windowsx64/vs -C Debug --output-on-failure`. Visual Studio solution (`bin/windowsx64/vs/Lightswitch.slnx`, generated, not committed): `./GenerateSolution.ps1 -QtPrefix <Qt kit> [-Open]`.
 - Application arguments: `--fullscreen`, `--config <file>` (default `lightswitch.ini` next to the executable).
 
 ## Layout

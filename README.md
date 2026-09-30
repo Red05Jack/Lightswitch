@@ -29,7 +29,7 @@ ctest --test-dir bin/windowsx64/vs -C Debug --output-on-failure
 bin/windowsx64/debug/Lightswitch.exe
 ```
 
-`cmake --preset windows-x64` also creates `bin/windowsx64/vs/Lightswitch.sln` for the Visual Studio IDE.
+Visual Studio 2026 IDE: `./GenerateSolution.ps1 -QtPrefix C:/Qt/6.8.0/msvc2022_64 -Open` configures the project and opens `bin/windowsx64/vs/Lightswitch.slnx`. The solution is generated on purpose and not committed, because CMake writes absolute paths of your machine into it.
 
 Configurations: `debug`, `release`, `debug_level_log`, `release_level_log`. All output lands in `bin/<system><arch>/<configuration>/`.
 
