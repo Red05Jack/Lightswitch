@@ -17,6 +17,7 @@ add_library(LightswitchCore STATIC
 	src/core/ClockModel.cpp
 	src/core/ILightController.cpp
 	src/core/DummyLightController.cpp
+	src/core/AlarmController.cpp
 )
 target_include_directories(LightswitchCore PUBLIC
 	src/core

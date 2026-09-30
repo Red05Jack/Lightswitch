@@ -11,3 +11,4 @@ endfunction()
 
 add_lightswitch_test(ClockModelTest)
 add_lightswitch_test(DummyLightControllerTest)
+add_lightswitch_test(AlarmControllerTest)
