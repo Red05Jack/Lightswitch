@@ -1,6 +1,7 @@
 #pragma once
 
 #include "AlarmSettings.h"
+#include "NightModeSettings.h"
 
 #include <QString>
 
@@ -15,9 +16,11 @@ public:
 	double Latitude() const;
 	double Longitude() const;
 	const AlarmSettings& Alarm() const;
+	const NightModeSettings& NightMode() const;
 
 private:
 	double m_latitude = 48.1374;
 	double m_longitude = 11.5755;
 	AlarmSettings m_alarm;
+	NightModeSettings m_nightMode;
 };

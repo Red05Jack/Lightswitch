@@ -4,6 +4,8 @@ import QtQuick.Window
 Window {
 	id: window
 
+	readonly property real designScale: Math.min(width, height) / 720
+
 	width: 720
 	height: 720
 	visible: true
@@ -15,12 +17,17 @@ Window {
 		anchors.centerIn: parent
 		width: 720
 		height: 720
-		scale: Math.min(window.width, window.height) / 720
+		scale: window.designScale
 
 		TimeTile {}
 		LightTile {}
 		WeatherTile {}
 		CalendarTile {}
 		AlarmTile {}
+	}
+
+	NightOverlay {
+		anchors.fill: parent
+		designScale: window.designScale
 	}
 }

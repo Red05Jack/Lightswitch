@@ -28,6 +28,8 @@ int main(int argc, char* argv[]) {
 	const Configuration configuration = Configuration::Load(parser.value(configOption));
 	AppController controller(configuration, parser.isSet(fullscreenOption));
 
+	application.installEventFilter(&controller.InputMonitor());
+
 	QQmlApplicationEngine engine;
 	QObject::connect(&engine, &QQmlApplicationEngine::objectCreationFailed, &application,
 		[]() { QCoreApplication::exit(-1); }, Qt::QueuedConnection);

@@ -27,6 +27,7 @@
     <ClCompile Include="..\src\core\ILightController.cpp" />
     <ClCompile Include="..\src\core\DummyLightController.cpp" />
     <ClCompile Include="..\src\core\AlarmController.cpp" />
+    <ClCompile Include="..\src\core\NightModeController.cpp" />
     <ClCompile Include="..\src\weather\OpenMeteoParser.cpp" />
     <ClCompile Include="..\src\weather\WeatherModel.cpp" />
     <ClCompile Include="..\src\weather\WeatherService.cpp" />
@@ -34,6 +35,7 @@
     <ClCompile Include="..\src\calendar\CalendarModel.cpp" />
     <ClCompile Include="..\src\app\Configuration.cpp" />
     <ClCompile Include="..\src\app\LogConfiguration.cpp" />
+    <ClCompile Include="..\src\app\InputActivityMonitor.cpp" />
     <ClCompile Include="..\src\app\AppController.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -41,15 +43,18 @@
     <QtMoc Include="..\src\core\ILightController.h" />
     <QtMoc Include="..\src\core\DummyLightController.h" />
     <QtMoc Include="..\src\core\AlarmController.h" />
+    <QtMoc Include="..\src\core\NightModeController.h" />
     <QtMoc Include="..\src\weather\WeatherModel.h" />
     <QtMoc Include="..\src\weather\WeatherService.h" />
     <QtMoc Include="..\src\calendar\CalendarModel.h" />
+    <QtMoc Include="..\src\app\InputActivityMonitor.h" />
     <QtMoc Include="..\src\app\AppController.h" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\core\IClock.h" />
     <ClInclude Include="..\src\core\SystemClock.h" />
     <ClInclude Include="..\src\core\AlarmSettings.h" />
+    <ClInclude Include="..\src\core\NightModeSettings.h" />
     <ClInclude Include="..\src\weather\WeatherForecast.h" />
     <ClInclude Include="..\src\weather\OpenMeteoParser.h" />
     <ClInclude Include="..\src\calendar\CalendarEvent.h" />

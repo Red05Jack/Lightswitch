@@ -6,6 +6,8 @@
 #include "Configuration.h"
 #include "DummyCalendarProvider.h"
 #include "DummyLightController.h"
+#include "InputActivityMonitor.h"
+#include "NightModeController.h"
 #include "SystemClock.h"
 #include "WeatherModel.h"
 #include "WeatherService.h"
@@ -18,6 +20,7 @@ class AppController : public QObject {
 	Q_PROPERTY(QObject* clock READ Clock CONSTANT)
 	Q_PROPERTY(QObject* light READ Light CONSTANT)
 	Q_PROPERTY(QObject* alarm READ Alarm CONSTANT)
+	Q_PROPERTY(QObject* nightMode READ NightMode CONSTANT)
 	Q_PROPERTY(QObject* weather READ Weather CONSTANT)
 	Q_PROPERTY(QObject* calendar READ Calendar CONSTANT)
 	Q_PROPERTY(bool isFullscreen READ IsFullscreen CONSTANT)
@@ -28,9 +31,11 @@ public:
 	QObject* Clock();
 	QObject* Light();
 	QObject* Alarm();
+	QObject* NightMode();
 	QObject* Weather();
 	QObject* Calendar();
 	bool IsFullscreen() const;
+	InputActivityMonitor& InputMonitor();
 
 	void Start();
 
@@ -39,6 +44,8 @@ private:
 	DummyLightController m_light;
 	ClockModel m_clockModel;
 	AlarmController m_alarmController;
+	NightModeController m_nightModeController;
+	InputActivityMonitor m_inputMonitor;
 	WeatherModel m_weatherModel;
 	WeatherService m_weatherService;
 	DummyCalendarProvider m_calendarProvider;

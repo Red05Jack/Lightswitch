@@ -47,6 +47,13 @@ longitude=11.5755
 [alarm]
 time=06:45           ; HH:mm, switches the light on
 days=Mon,Tue,Wed,Thu,Fri
+
+[nightmode]
+enabled=true         ; screen goes dark after 5 minutes without input ...
+start=22:00          ; ... between start and end (may span midnight),
+end=06:00            ; but never while the light is on
 ```
+
+Night mode shows only a dark clock on a black screen; a touch wakes it up.
 
 Missing or invalid values fall back to these defaults. Weather data comes from [Open-Meteo](https://open-meteo.com/) (no API key needed).

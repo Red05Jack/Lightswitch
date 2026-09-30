@@ -10,6 +10,7 @@ QtObject {
 	readonly property color lightTileFill: "#1F493B"
 	readonly property color lightTileBorder: "#3C4E50"
 	readonly property color emptyDot: "#2D2B2E"
+	readonly property color nightClock: "#1D1D1D"
 
 	readonly property real tileRadius: 15
 	readonly property int labelSize: 21

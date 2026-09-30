@@ -11,6 +11,7 @@
 		<file>WeatherTile.qml</file>
 		<file>CalendarTile.qml</file>
 		<file>AlarmTile.qml</file>
+		<file>NightOverlay.qml</file>
 		<file alias="fonts/Manufaktur-Bold.ttf">../resources/fonts/Manufaktur-Bold.ttf</file>
 		<file alias="fonts/Manufaktur-Heavy.ttf">../resources/fonts/Manufaktur-Heavy.ttf</file>
 	</qresource>

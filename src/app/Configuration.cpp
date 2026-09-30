@@ -16,6 +16,23 @@ double ReadCoordinate(const QSettings& settings, const QString& key, double fall
 	}
 	return value;
 }
+
+// Reads the night mode section; missing or invalid entries keep the values already in the target.
+void ReadNightMode(const QSettings& settings, NightModeSettings& nightMode) {
+	if (settings.contains(QStringLiteral("nightmode/enabled"))) {
+		nightMode.isEnabled = settings.value(QStringLiteral("nightmode/enabled")).toBool();
+	}
+
+	const QTime startTime = QTime::fromString(settings.value(QStringLiteral("nightmode/start")).toString().trimmed(), QStringLiteral("HH:mm"));
+	if (startTime.isValid()) {
+		nightMode.startTime = startTime;
+	}
+
+	const QTime endTime = QTime::fromString(settings.value(QStringLiteral("nightmode/end")).toString().trimmed(), QStringLiteral("HH:mm"));
+	if (endTime.isValid()) {
+		nightMode.endTime = endTime;
+	}
+}
 }
 
 // Loads the configuration file and keeps the defaults for everything that is missing or invalid.
@@ -35,6 +52,8 @@ Configuration Configuration::Load(const QString& filePath) {
 		const QString daysText = settings.value(QStringLiteral("alarm/days")).toStringList().join(QLatin1Char(','));
 		configuration.m_alarm.activeDays = ParseActiveDays(daysText);
 	}
+
+	ReadNightMode(settings, configuration.m_nightMode);
 
 	return configuration;
 }
@@ -68,4 +87,9 @@ double Configuration::Longitude() const {
 // Returns the alarm time and active weekdays.
 const AlarmSettings& Configuration::Alarm() const {
 	return m_alarm;
+}
+
+// Returns the night mode schedule.
+const NightModeSettings& Configuration::NightMode() const {
+	return m_nightMode;
 }

@@ -27,6 +27,8 @@ private slots:
 	void EmptyFileUsesDefaults();
 	void InvalidValuesUseDefaults();
 	void ParsesActiveDays();
+	void ReadsNightMode();
+	void InvalidNightModeUsesDefaults();
 };
 
 void ConfigurationTest::LoadsValidFile() {
@@ -40,6 +42,28 @@ void ConfigurationTest::LoadsValidFile() {
 	QCOMPARE(configuration.Longitude(), 13.405);
 	QCOMPARE(configuration.Alarm().time, QTime(7, 30));
 	QCOMPARE(configuration.Alarm().activeDays, (Days{true, false, true, false, false, false, true}));
+}
+
+void ConfigurationTest::ReadsNightMode() {
+	QTemporaryDir directory;
+	const QString path = WriteIniFile(directory, "[nightmode]\nenabled=false\nstart=23:15\nend=05:30\n");
+
+	const Configuration configuration = Configuration::Load(path);
+
+	QVERIFY(!configuration.NightMode().isEnabled);
+	QCOMPARE(configuration.NightMode().startTime, QTime(23, 15));
+	QCOMPARE(configuration.NightMode().endTime, QTime(5, 30));
+}
+
+void ConfigurationTest::InvalidNightModeUsesDefaults() {
+	QTemporaryDir directory;
+	const QString path = WriteIniFile(directory, "[nightmode]\nstart=99:99\nend=abc\n");
+
+	const Configuration configuration = Configuration::Load(path);
+
+	QVERIFY(configuration.NightMode().isEnabled);
+	QCOMPARE(configuration.NightMode().startTime, QTime(22, 0));
+	QCOMPARE(configuration.NightMode().endTime, QTime(6, 0));
 }
 
 void ConfigurationTest::MissingFileUsesDefaults() {
