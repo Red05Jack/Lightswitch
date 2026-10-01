@@ -1,0 +1,5 @@
+; Copy to google.ini next to lightswitch.ini and fill in the OAuth client (type "Desktop app") of your
+; Google Cloud project with the Google Calendar API enabled. Never commit google.ini.
+[google]
+clientId=
+clientSecret=

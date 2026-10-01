@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copy to Lightswitch.user.props (not committed) and adjust QtRoot to your Qt 6 MSVC kit. Alternatively set the QTDIR environment variable. -->
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <QtRoot>C:\Qt\6.8.0\msvc2022_64</QtRoot>
+  </PropertyGroup>
+</Project>

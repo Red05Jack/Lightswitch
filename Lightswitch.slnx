@@ -1,0 +1,51 @@
+<Solution>
+	<Configurations>
+		<BuildType Name="Debug" />
+		<BuildType Name="DebugLevelLog" />
+		<BuildType Name="Release" />
+		<BuildType Name="ReleaseLevelLog" />
+		<Platform Name="x64" />
+	</Configurations>
+	<Project Path="vs/Lightswitch.vcxproj" Id="6f1d2c10-0002-4a10-9a10-000000000002">
+		<BuildDependency Project="vs/LightswitchCore.vcxproj" />
+	</Project>
+	<Project Path="vs/LightswitchCore.vcxproj" Id="6f1d2c10-0001-4a10-9a10-000000000001" />
+	<Folder Name="/Tests/">
+		<Project Path="vs/ClockModelTest.vcxproj" Id="6f1d2c10-0011-4a10-9a10-000000000011">
+			<BuildDependency Project="vs/LightswitchCore.vcxproj" />
+		</Project>
+		<Project Path="vs/DummyLightControllerTest.vcxproj" Id="6f1d2c10-0012-4a10-9a10-000000000012">
+			<BuildDependency Project="vs/LightswitchCore.vcxproj" />
+		</Project>
+		<Project Path="vs/AlarmControllerTest.vcxproj" Id="6f1d2c10-0013-4a10-9a10-000000000013">
+			<BuildDependency Project="vs/LightswitchCore.vcxproj" />
+		</Project>
+		<Project Path="vs/ConfigurationTest.vcxproj" Id="6f1d2c10-0014-4a10-9a10-000000000014">
+			<BuildDependency Project="vs/LightswitchCore.vcxproj" />
+		</Project>
+		<Project Path="vs/OpenMeteoParserTest.vcxproj" Id="6f1d2c10-0015-4a10-9a10-000000000015">
+			<BuildDependency Project="vs/LightswitchCore.vcxproj" />
+		</Project>
+		<Project Path="vs/WeatherServiceTest.vcxproj" Id="6f1d2c10-0016-4a10-9a10-000000000016">
+			<BuildDependency Project="vs/LightswitchCore.vcxproj" />
+		</Project>
+		<Project Path="vs/WeatherModelTest.vcxproj" Id="6f1d2c10-0017-4a10-9a10-000000000017">
+			<BuildDependency Project="vs/LightswitchCore.vcxproj" />
+		</Project>
+		<Project Path="vs/DummyCalendarProviderTest.vcxproj" Id="6f1d2c10-0018-4a10-9a10-000000000018">
+			<BuildDependency Project="vs/LightswitchCore.vcxproj" />
+		</Project>
+		<Project Path="vs/CalendarModelTest.vcxproj" Id="6f1d2c10-0019-4a10-9a10-000000000019">
+			<BuildDependency Project="vs/LightswitchCore.vcxproj" />
+		</Project>
+		<Project Path="vs/NightModeControllerTest.vcxproj" Id="6f1d2c10-001a-4a10-9a10-00000000001a">
+			<BuildDependency Project="vs/LightswitchCore.vcxproj" />
+		</Project>
+		<Project Path="vs/LocationControllerTest.vcxproj" Id="6f1d2c10-001b-4a10-9a10-00000000001b">
+			<BuildDependency Project="vs/LightswitchCore.vcxproj" />
+		</Project>
+		<Project Path="vs/GoogleCalendarParserTest.vcxproj" Id="6f1d2c10-001c-4a10-9a10-00000000001c">
+			<BuildDependency Project="vs/LightswitchCore.vcxproj" />
+		</Project>
+	</Folder>
+</Solution>

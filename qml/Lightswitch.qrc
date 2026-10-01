@@ -1,0 +1,24 @@
+<RCC>
+	<qresource prefix="/qt/qml/Lightswitch/Ui">
+		<file>qmldir</file>
+		<file>Main.qml</file>
+		<file>Theme.qml</file>
+		<file>Tile.qml</file>
+		<file>TileText.qml</file>
+		<file>DotMatrix.qml</file>
+		<file>TimeTile.qml</file>
+		<file>LightTile.qml</file>
+		<file>WeatherTile.qml</file>
+		<file>CalendarTile.qml</file>
+		<file>CalendarScreen.qml</file>
+		<file>AlarmTile.qml</file>
+		<file>NightOverlay.qml</file>
+		<file>SettingsButton.qml</file>
+		<file>TimeStepper.qml</file>
+		<file>SettingsPage.qml</file>
+		<file>SettingsScreen.qml</file>
+		<file>AlarmSettingsScreen.qml</file>
+		<file alias="fonts/Manufaktur-Bold.ttf">../resources/fonts/Manufaktur-Bold.ttf</file>
+		<file alias="fonts/Manufaktur-Heavy.ttf">../resources/fonts/Manufaktur-Heavy.ttf</file>
+	</qresource>
+</RCC>

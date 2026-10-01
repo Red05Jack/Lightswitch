@@ -1,0 +1,89 @@
+#include "WeatherService.h"
+
+#include "OpenMeteoParser.h"
+
+#include <QLoggingCategory>
+#include <QNetworkReply>
+#include <QNetworkRequest>
+
+Q_LOGGING_CATEGORY(lcWeather, "lightswitch.weather")
+
+namespace {
+constexpr int refreshIntervalMilliseconds = 15 * 60 * 1000;
+constexpr int requestTimeoutMilliseconds = 15 * 1000;
+constexpr int defaultRetryIntervalMilliseconds = 60 * 1000;
+}
+
+WeatherService::WeatherService(double latitude, double longitude, QObject* pParent)
+	: WeatherService(OpenMeteoParser::BuildRequestUrl(latitude, longitude), pParent) {
+}
+
+WeatherService::WeatherService(const QUrl& requestUrl, QObject* pParent)
+	: QObject(pParent)
+	, m_requestUrl(requestUrl) {
+	m_refreshTimer.setInterval(refreshIntervalMilliseconds);
+	connect(&m_refreshTimer, &QTimer::timeout, this, &WeatherService::Refresh);
+
+	// Retrying soon matters when the device starts before the network is ready.
+	m_retryTimer.setSingleShot(true);
+	m_retryTimer.setInterval(defaultRetryIntervalMilliseconds);
+	connect(&m_retryTimer, &QTimer::timeout, this, &WeatherService::Refresh);
+}
+
+// Sets the delay before a failed request is retried.
+void WeatherService::SetRetryInterval(int milliseconds) {
+	m_retryTimer.setInterval(milliseconds);
+}
+
+// Switches to another location and fetches its forecast right away when the service is running.
+void WeatherService::SetLocation(double latitude, double longitude) {
+	m_requestUrl = OpenMeteoParser::BuildRequestUrl(latitude, longitude);
+	if (m_refreshTimer.isActive()) {
+		Refresh();
+	}
+}
+
+// Fetches the forecast immediately and then keeps refreshing it.
+void WeatherService::Start() {
+	Refresh();
+	m_refreshTimer.start();
+}
+
+// Requests a fresh forecast; failures are logged and the previous data stays visible.
+void WeatherService::Refresh() {
+	if (m_pendingReply) {
+		m_pendingReply->disconnect(this);
+		m_pendingReply->abort();
+		m_pendingReply->deleteLater();
+	}
+
+	QNetworkRequest request(m_requestUrl);
+	request.setTransferTimeout(requestTimeoutMilliseconds);
+
+	QNetworkReply* pReply = m_network.get(request);
+	m_pendingReply = pReply;
+	connect(pReply, &QNetworkReply::finished, this, [this, pReply]() { HandleReply(pReply); });
+	qCDebug(lcWeather) << "Requesting forecast" << m_requestUrl;
+}
+
+// Converts a finished reply into a forecast; on failure it logs the reason and schedules a retry.
+void WeatherService::HandleReply(QNetworkReply* pReply) {
+	pReply->deleteLater();
+
+	if (pReply->error() != QNetworkReply::NoError) {
+		qCWarning(lcWeather) << "Forecast request failed:" << pReply->errorString();
+		m_retryTimer.start();
+		return;
+	}
+
+	const std::optional<WeatherForecast> forecast = OpenMeteoParser::Parse(pReply->readAll());
+	if (!forecast.has_value()) {
+		qCWarning(lcWeather) << "Forecast response could not be parsed.";
+		m_retryTimer.start();
+		return;
+	}
+
+	qCDebug(lcWeather) << "Forecast received, temperature" << forecast->temperatureCelsius;
+	m_retryTimer.stop();
+	emit ForecastReady(*forecast);
+}
