@@ -35,6 +35,9 @@ private slots:
 	void RefreshUpdatesAndEmitsChanged();
 	void ShowsDateOnlyForAllDayEvents();
 	void AsksToLinkAccount();
+	void PrefersEventsOverEarlierRemindersAndBirthdays();
+	void FallsBackToFirstEntryWithoutEvents();
+	void ListsAllEntriesInOrder();
 };
 
 void CalendarModelTest::ShowsNextEvent() {
@@ -102,6 +105,57 @@ void CalendarModelTest::AsksToLinkAccount() {
 	model.Refresh();
 	QCOMPARE(model.TitleText(), QStringLiteral("No events"));
 	QCOMPARE(spy.count(), 1);
+}
+
+namespace {
+CalendarEvent MakeEntry(const QString& title, const QDateTime& start, bool isAllDay, CalendarEventKind kind) {
+	CalendarEvent event;
+	event.title = title;
+	event.start = start;
+	event.isAllDay = isAllDay;
+	event.kind = kind;
+	return event;
+}
+
+const QDateTime now(QDate(2026, 9, 30), QTime(5, 0));
+}
+
+void CalendarModelTest::PrefersEventsOverEarlierRemindersAndBirthdays() {
+	FakeClock clock(now);
+	StubCalendarProvider provider({
+		MakeEntry(QStringLiteral("Birthday"), QDateTime(QDate(2026, 9, 30), QTime(0, 0)), true, CalendarEventKind::Birthday),
+		MakeEntry(QStringLiteral("Reminder"), QDateTime(QDate(2026, 9, 30), QTime(6, 0)), false, CalendarEventKind::Reminder),
+		MakeEntry(QStringLiteral("Meeting"), QDateTime(QDate(2026, 9, 30), QTime(8, 0)), false, CalendarEventKind::Event)});
+
+	const CalendarModel model(provider, clock);
+
+	QCOMPARE(model.TitleText(), QStringLiteral("Meeting"));
+	QCOMPARE(model.WhenText(), QStringLiteral("30.09.2026") + QChar(0x2022) + QStringLiteral("08:00"));
+}
+
+void CalendarModelTest::FallsBackToFirstEntryWithoutEvents() {
+	FakeClock clock(now);
+	StubCalendarProvider provider({
+		MakeEntry(QStringLiteral("Birthday"), QDateTime(QDate(2026, 9, 30), QTime(0, 0)), true, CalendarEventKind::Birthday),
+		MakeEntry(QStringLiteral("Reminder"), QDateTime(QDate(2026, 9, 30), QTime(6, 0)), false, CalendarEventKind::Reminder)});
+
+	const CalendarModel model(provider, clock);
+
+	QCOMPARE(model.TitleText(), QStringLiteral("Birthday"));
+}
+
+void CalendarModelTest::ListsAllEntriesInOrder() {
+	FakeClock clock(now);
+	StubCalendarProvider provider({
+		MakeEntry(QStringLiteral("Reminder"), QDateTime(QDate(2026, 9, 30), QTime(6, 0)), false, CalendarEventKind::Reminder),
+		MakeEntry(QStringLiteral("Meeting"), QDateTime(QDate(2026, 9, 30), QTime(8, 0)), false, CalendarEventKind::Event)});
+
+	const CalendarModel model(provider, clock);
+
+	QCOMPARE(model.Entries().size(), 2);
+	QCOMPARE(model.Entries().at(0).toMap().value(QStringLiteral("title")).toString(), QStringLiteral("Reminder"));
+	QCOMPARE(model.Entries().at(0).toMap().value(QStringLiteral("kind")).toString(), QStringLiteral("reminder"));
+	QCOMPARE(model.Entries().at(1).toMap().value(QStringLiteral("kind")).toString(), QStringLiteral("event"));
 }
 
 QTEST_GUILESS_MAIN(CalendarModelTest)

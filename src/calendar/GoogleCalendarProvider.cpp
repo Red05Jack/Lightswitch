@@ -7,11 +7,17 @@
 #include <QNetworkRequest>
 #include <QUrlQuery>
 
+#include <algorithm>
+
 Q_LOGGING_CATEGORY(lcGoogleCalendar, "lightswitch.calendar.google")
 
 namespace {
-const QString eventsEndpoint = QStringLiteral("https://www.googleapis.com/calendar/v3/calendars/primary/events");
-constexpr int refreshIntervalMilliseconds = 10 * 60 * 1000;
+const QString calendarsEndpoint = QStringLiteral("https://www.googleapis.com/calendar/v3/calendars/");
+const QString tasksEndpoint = QStringLiteral("https://tasks.googleapis.com/tasks/v1/lists/@default/tasks");
+const QString primaryCalendarId = QStringLiteral("primary");
+// Birthdays of the Google contacts live in this hidden calendar.
+const QString birthdayCalendarId = QStringLiteral("addressbook#contacts@group.v.calendar.google.com");
+constexpr int refreshIntervalMilliseconds = 5 * 60 * 1000;
 constexpr int retryIntervalMilliseconds = 60 * 1000;
 constexpr int requestTimeoutMilliseconds = 15 * 1000;
 constexpr int maximumEventCount = 50;
@@ -28,10 +34,13 @@ GoogleCalendarProvider::GoogleCalendarProvider(const GoogleCredentials& credenti
 	m_retryTimer.setInterval(retryIntervalMilliseconds);
 	connect(&m_retryTimer, &QTimer::timeout, this, &GoogleCalendarProvider::Refresh);
 
-	connect(&m_authorizer, &GoogleAuthorizer::AccessTokenReady, this, &GoogleCalendarProvider::FetchEvents);
+	connect(&m_authorizer, &GoogleAuthorizer::AccessTokenReady, this, &GoogleCalendarProvider::FetchAll);
 	connect(&m_authorizer, &GoogleAuthorizer::RequestFailed, this, &GoogleCalendarProvider::ScheduleRetry);
 	connect(&m_authorizer, &GoogleAuthorizer::AuthorizationUrlReady, this, &GoogleCalendarProvider::AuthorizationUrlReady);
 	connect(&m_authorizer, &GoogleAuthorizer::LinkedChanged, this, [this]() {
+		m_calendarEvents.clear();
+		m_birthdayEvents.clear();
+		m_reminders.clear();
 		m_events.clear();
 		emit Changed();
 		Refresh();
@@ -69,8 +78,15 @@ void GoogleCalendarProvider::Refresh() {
 	m_authorizer.RequestAccessToken();
 }
 
-// Requests the events from now until the end of the look-ahead window.
-void GoogleCalendarProvider::FetchEvents(const QString& accessToken) {
+// Requests events, birthdays and reminders; only the primary calendar triggers a retry when it fails.
+void GoogleCalendarProvider::FetchAll(const QString& accessToken) {
+	FetchCalendar(primaryCalendarId, accessToken, true);
+	FetchCalendar(birthdayCalendarId, accessToken, false);
+	FetchReminders(accessToken);
+}
+
+// Requests the events of one calendar from now until the end of the look-ahead window.
+void GoogleCalendarProvider::FetchCalendar(const QString& calendarId, const QString& accessToken, bool isEssential) {
 	const QDateTime now = QDateTime::currentDateTimeUtc();
 
 	QUrlQuery query;
@@ -80,28 +96,68 @@ void GoogleCalendarProvider::FetchEvents(const QString& accessToken) {
 	query.addQueryItem(QStringLiteral("orderBy"), QStringLiteral("startTime"));
 	query.addQueryItem(QStringLiteral("maxResults"), QString::number(maximumEventCount));
 
-	QUrl url{eventsEndpoint};
+	QUrl url{calendarsEndpoint + QString::fromLatin1(QUrl::toPercentEncoding(calendarId)) + QStringLiteral("/events")};
 	url.setQuery(query);
+
+	const bool isBirthdayCalendar = calendarId == birthdayCalendarId;
+	Fetch(url, accessToken, isEssential, [this, isBirthdayCalendar](const QByteArray& body) {
+		if (isBirthdayCalendar) {
+			m_birthdayEvents = GoogleCalendarParser::ParseEvents(body, CalendarEventKind::Birthday);
+		} else {
+			m_calendarEvents = GoogleCalendarParser::ParseEvents(body);
+		}
+		RebuildEvents();
+	});
+}
+
+// Requests the open tasks of the default list that are due within the look-ahead window; Calendar reminders are stored there.
+void GoogleCalendarProvider::FetchReminders(const QString& accessToken) {
+	const QDate today = QDate::currentDate();
+
+	QUrlQuery query;
+	query.addQueryItem(QStringLiteral("showCompleted"), QStringLiteral("false"));
+	query.addQueryItem(QStringLiteral("dueMin"), today.toString(Qt::ISODate) + QStringLiteral("T00:00:00Z"));
+	query.addQueryItem(QStringLiteral("dueMax"), today.addDays(lookAheadDays).toString(Qt::ISODate) + QStringLiteral("T00:00:00Z"));
+	query.addQueryItem(QStringLiteral("maxResults"), QString::number(maximumEventCount));
+
+	QUrl url{tasksEndpoint};
+	url.setQuery(query);
+	Fetch(url, accessToken, false, [this](const QByteArray& body) {
+		m_reminders = GoogleCalendarParser::ParseReminders(body);
+		RebuildEvents();
+	});
+}
+
+// Sends an authorized GET request; a failure is logged and only retried when the data is essential.
+void GoogleCalendarProvider::Fetch(const QUrl& url, const QString& accessToken, bool isEssential, std::function<void(const QByteArray&)> onSuccess) {
 	QNetworkRequest request(url);
 	request.setRawHeader("Authorization", "Bearer " + accessToken.toUtf8());
 	request.setTransferTimeout(requestTimeoutMilliseconds);
 
 	QNetworkReply* pReply = m_network.get(request);
-	connect(pReply, &QNetworkReply::finished, this, [this, pReply]() { HandleEventsReply(pReply); });
+	connect(pReply, &QNetworkReply::finished, this, [this, pReply, isEssential, onSuccess = std::move(onSuccess)]() {
+		pReply->deleteLater();
+
+		if (pReply->error() != QNetworkReply::NoError) {
+			const int statusCode = pReply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+			qCWarning(lcGoogleCalendar) << "Request failed:" << pReply->url().path() << "status" << statusCode << pReply->readAll().left(400);
+			if (isEssential) {
+				ScheduleRetry();
+			}
+			return;
+		}
+
+		onSuccess(pReply->readAll());
+	});
 }
 
-// Replaces the cached events with the parsed reply; failures are logged and the old events stay visible.
-void GoogleCalendarProvider::HandleEventsReply(QNetworkReply* pReply) {
-	pReply->deleteLater();
-
-	if (pReply->error() != QNetworkReply::NoError) {
-		qCWarning(lcGoogleCalendar) << "Events request failed:" << pReply->errorString();
-		ScheduleRetry();
-		return;
-	}
-
-	m_events = GoogleCalendarParser::ParseEvents(pReply->readAll());
-	qCDebug(lcGoogleCalendar) << "Received" << m_events.size() << "events";
+// Merges all sources into one list sorted by start time.
+void GoogleCalendarProvider::RebuildEvents() {
+	m_events = m_calendarEvents + m_birthdayEvents + m_reminders;
+	std::stable_sort(m_events.begin(), m_events.end(), [](const CalendarEvent& left, const CalendarEvent& right) {
+		return left.start < right.start;
+	});
+	qCDebug(lcGoogleCalendar) << "Cached" << m_events.size() << "entries";
 	emit Changed();
 }
 

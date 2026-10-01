@@ -42,7 +42,8 @@
     <PostBuildEvent>
       <Command>set "VCINSTALLDIR=$(VCInstallDir)"
 "$(QtRoot)bin\windeployqt.exe" --no-translations --qmldir "$(RepositoryRoot)qml" "$(TargetPath)"
-copy /Y "$(RepositoryRoot)config\lightswitch.ini" "$(OutDir)lightswitch.ini"</Command>
+copy /Y "$(RepositoryRoot)config\lightswitch.ini" "$(OutDir)lightswitch.ini"
+if exist "$(RepositoryRoot)config\google.ini" copy /Y "$(RepositoryRoot)config\google.ini" "$(OutDir)google.ini"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

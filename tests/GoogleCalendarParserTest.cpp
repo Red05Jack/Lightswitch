@@ -37,6 +37,8 @@ private slots:
 	void RejectsEmptyTokenResponse();
 	void SelectsEventsInsideWindow();
 	void KeepsAllDayEventOfToday();
+	void MarksBirthdaysAndUsesDefaultKind();
+	void ParsesOpenTasksAsReminders();
 	void ComputesPkceChallengeOfRfcExample();
 };
 
@@ -119,6 +121,34 @@ void GoogleCalendarParserTest::KeepsAllDayEventOfToday() {
 
 	QCOMPARE(upcoming.size(), 1);
 	QCOMPARE(upcoming.at(0).title, QStringLiteral("Today"));
+}
+
+void GoogleCalendarParserTest::MarksBirthdaysAndUsesDefaultKind() {
+	const QByteArray json = R"({ "items": [
+		{ "summary": "Anna", "eventType": "birthday", "start": { "date": "2026-10-02" } },
+		{ "summary": "Dentist", "eventType": "default", "start": { "date": "2026-10-03" } } ] })";
+
+	const QList<CalendarEvent> events = GoogleCalendarParser::ParseEvents(json, CalendarEventKind::Birthday);
+
+	QCOMPARE(events.size(), 2);
+	QCOMPARE(events.at(0).kind, CalendarEventKind::Birthday);
+	QCOMPARE(events.at(1).kind, CalendarEventKind::Birthday);
+	QCOMPARE(GoogleCalendarParser::ParseEvents(json).at(1).kind, CalendarEventKind::Event);
+}
+
+void GoogleCalendarParserTest::ParsesOpenTasksAsReminders() {
+	const QByteArray json = R"({ "items": [
+		{ "title": "Pay rent", "status": "needsAction", "due": "2026-10-03T00:00:00.000Z" },
+		{ "title": "Done", "status": "completed", "due": "2026-10-02T00:00:00.000Z" },
+		{ "title": "No due date", "status": "needsAction" } ] })";
+
+	const QList<CalendarEvent> reminders = GoogleCalendarParser::ParseReminders(json);
+
+	QCOMPARE(reminders.size(), 1);
+	QCOMPARE(reminders.at(0).title, QStringLiteral("Pay rent"));
+	QCOMPARE(reminders.at(0).start, QDateTime(QDate(2026, 10, 3), QTime(0, 0)));
+	QVERIFY(reminders.at(0).isAllDay);
+	QCOMPARE(reminders.at(0).kind, CalendarEventKind::Reminder);
 }
 
 void GoogleCalendarParserTest::ComputesPkceChallengeOfRfcExample() {

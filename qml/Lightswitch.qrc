@@ -10,6 +10,7 @@
 		<file>LightTile.qml</file>
 		<file>WeatherTile.qml</file>
 		<file>CalendarTile.qml</file>
+		<file>CalendarScreen.qml</file>
 		<file>AlarmTile.qml</file>
 		<file>NightOverlay.qml</file>
 		<file>SettingsButton.qml</file>

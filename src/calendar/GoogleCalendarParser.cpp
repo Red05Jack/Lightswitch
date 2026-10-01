@@ -8,7 +8,7 @@
 
 namespace {
 // Converts one item of the events list; returns false for cancelled or undated entries.
-bool ParseEvent(const QJsonObject& item, CalendarEvent& event) {
+bool ParseEvent(const QJsonObject& item, CalendarEventKind defaultKind, CalendarEvent& event) {
 	if (item.value(QStringLiteral("status")).toString() == QStringLiteral("cancelled")) {
 		return false;
 	}
@@ -32,25 +32,56 @@ bool ParseEvent(const QJsonObject& item, CalendarEvent& event) {
 	if (event.title.isEmpty()) {
 		event.title = QStringLiteral("(No title)");
 	}
+	const bool isBirthday = item.value(QStringLiteral("eventType")).toString() == QStringLiteral("birthday");
+	event.kind = isBirthday ? CalendarEventKind::Birthday : defaultKind;
 	return true;
+}
+
+void SortByStart(QList<CalendarEvent>& events) {
+	std::sort(events.begin(), events.end(), [](const CalendarEvent& left, const CalendarEvent& right) {
+		return left.start < right.start;
+	});
 }
 }
 
 // Reads the "items" array of an events list response; an invalid document yields no events.
-QList<CalendarEvent> GoogleCalendarParser::ParseEvents(const QByteArray& json) {
+QList<CalendarEvent> GoogleCalendarParser::ParseEvents(const QByteArray& json, CalendarEventKind defaultKind) {
 	QList<CalendarEvent> events;
 	const QJsonArray items = QJsonDocument::fromJson(json).object().value(QStringLiteral("items")).toArray();
 	for (const QJsonValue& item : items) {
 		CalendarEvent event;
-		if (ParseEvent(item.toObject(), event)) {
+		if (ParseEvent(item.toObject(), defaultKind, event)) {
 			events.append(event);
 		}
 	}
 
-	std::sort(events.begin(), events.end(), [](const CalendarEvent& left, const CalendarEvent& right) {
-		return left.start < right.start;
-	});
+	SortByStart(events);
 	return events;
+}
+
+// Reads the open tasks of a task list response as all-day reminders; Google only keeps the due date of a task.
+QList<CalendarEvent> GoogleCalendarParser::ParseReminders(const QByteArray& json) {
+	QList<CalendarEvent> reminders;
+	const QJsonArray items = QJsonDocument::fromJson(json).object().value(QStringLiteral("items")).toArray();
+	for (const QJsonValue& value : items) {
+		const QJsonObject item = value.toObject();
+		const QString title = item.value(QStringLiteral("title")).toString().trimmed();
+		const QDate dueDate = QDate::fromString(item.value(QStringLiteral("due")).toString().left(10), Qt::ISODate);
+		const bool isCompleted = item.value(QStringLiteral("status")).toString() == QStringLiteral("completed");
+		if (title.isEmpty() || !dueDate.isValid() || isCompleted) {
+			continue;
+		}
+
+		CalendarEvent reminder;
+		reminder.title = title;
+		reminder.start = QDateTime(dueDate, QTime(0, 0));
+		reminder.isAllDay = true;
+		reminder.kind = CalendarEventKind::Reminder;
+		reminders.append(reminder);
+	}
+
+	SortByStart(reminders);
+	return reminders;
 }
 
 // Reads the access token, optional refresh token and lifetime, or the error code of a failed request.

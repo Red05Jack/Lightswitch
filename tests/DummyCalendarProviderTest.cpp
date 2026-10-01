@@ -38,7 +38,7 @@ void DummyCalendarProviderTest::ReturnsSortedEventsNotBeforeFrom() {
 
 	QVERIFY(!events.isEmpty());
 	for (int index = 0; index < events.size(); ++index) {
-		QVERIFY(events.at(index).start >= from);
+		QVERIFY(events.at(index).isAllDay ? events.at(index).start.date() >= from.date() : events.at(index).start >= from);
 		if (index > 0) {
 			QVERIFY(events.at(index - 1).start <= events.at(index).start);
 		}
@@ -50,6 +50,9 @@ void DummyCalendarProviderTest::EventsLieWithinDaytime() {
 
 	for (const CalendarEvent& event : provider.UpcomingEvents(from)) {
 		QVERIFY(!event.title.isEmpty());
+		if (event.kind != CalendarEventKind::Event) {
+			continue;
+		}
 		QVERIFY(event.start.time().hour() >= 8);
 		QVERIFY(event.start.time().hour() <= 20);
 	}

@@ -67,11 +67,11 @@ Night mode shows only a dark clock on a black screen; a touch wakes it up.
 
 ## Google Calendar
 
-The Calendar tile shows the next event of the primary Google calendar within the next 7 days (all-day events show only the date). Without Google credentials it shows random dummy events.
+The Calendar tile shows the next event within the next 7 days (all-day events show only the date, long titles use up to three lines). Real events take precedence: reminders and birthdays are only shown there when no event is coming up. Tapping the tile opens the list of all upcoming events, reminders (Google Tasks) and birthdays (Google contacts). Without Google credentials it shows random dummy entries.
 
-1. In the [Google Cloud Console](https://console.cloud.google.com/) enable the Google Calendar API and create an OAuth client of type **Desktop app** (add your account as test user while the consent screen is in testing mode).
+1. In the [Google Cloud Console](https://console.cloud.google.com/) enable the Google Calendar API and the Google Tasks API (reminders; Google only provides their due date, not the time) and create an OAuth client of type **Desktop app** (add your account as test user while the consent screen is in testing mode).
 2. Copy `config/google.ini.example` to `google.ini` next to `lightswitch.ini` and enter the client id and secret. The file is git-ignored.
-3. Start the app and tap the Calendar tile ("Link Google"). The Google sign-in opens in the default browser **on the same machine** (the address is also written to the log); after granting read access the refresh token is stored in `google-token.ini` next to the configuration file.
+3. Start the app and tap the Calendar tile ("Link Google"). The Google sign-in opens in the default browser **on the same machine** (the address is also written to the log); after granting read access to calendar and tasks the refresh token is stored in `google-token.ini` next to the configuration file.
 
 Google does not allow the calendar scope for the device code flow, so the one-time sign-in needs a browser on the machine running the app. For a headless device, link it once on a PC and copy `google-token.ini` (and `google.ini`) next to the device's `lightswitch.ini`.
 

@@ -9,7 +9,7 @@
 Q_LOGGING_CATEGORY(lcWeather, "lightswitch.weather")
 
 namespace {
-constexpr int refreshIntervalMilliseconds = 30 * 60 * 1000;
+constexpr int refreshIntervalMilliseconds = 15 * 60 * 1000;
 constexpr int requestTimeoutMilliseconds = 15 * 1000;
 constexpr int defaultRetryIntervalMilliseconds = 60 * 1000;
 }

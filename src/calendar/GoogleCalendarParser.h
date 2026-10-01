@@ -13,10 +13,11 @@ struct GoogleTokenResponse {
 	QString errorCode;
 };
 
-// Parses the JSON documents of the Google Calendar and OAuth endpoints.
+// Parses the JSON documents of the Google Calendar, Google Tasks (reminders) and OAuth endpoints.
 class GoogleCalendarParser {
 public:
-	static QList<CalendarEvent> ParseEvents(const QByteArray& json);
+	static QList<CalendarEvent> ParseEvents(const QByteArray& json, CalendarEventKind defaultKind = CalendarEventKind::Event);
+	static QList<CalendarEvent> ParseReminders(const QByteArray& json);
 	static GoogleTokenResponse ParseTokenResponse(const QByteArray& json);
 	static QList<CalendarEvent> SelectUpcoming(const QList<CalendarEvent>& events, const QDateTime& from, int lookAheadDays);
 };

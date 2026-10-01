@@ -16,7 +16,7 @@ Q_LOGGING_CATEGORY(lcGoogleAuth, "lightswitch.calendar.auth")
 namespace {
 const QString authorizationEndpoint = QStringLiteral("https://accounts.google.com/o/oauth2/v2/auth");
 const QString tokenEndpoint = QStringLiteral("https://oauth2.googleapis.com/token");
-const QString calendarScope = QStringLiteral("https://www.googleapis.com/auth/calendar.readonly");
+const QString calendarScope = QStringLiteral("https://www.googleapis.com/auth/calendar.readonly https://www.googleapis.com/auth/tasks.readonly");
 const QString refreshTokenKey = QStringLiteral("google/refreshToken");
 constexpr int requestTimeoutMilliseconds = 15 * 1000;
 constexpr int linkingTimeoutMilliseconds = 10 * 60 * 1000;

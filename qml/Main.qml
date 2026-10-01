@@ -24,13 +24,24 @@ Window {
 		}
 		LightTile {}
 		WeatherTile {}
-		CalendarTile {}
+		CalendarTile {
+			onListRequested: calendarScreen.visible = true
+		}
 		AlarmTile {
 			onSettingsRequested: alarmSettingsScreen.visible = true
 		}
 
 		SettingsScreen {
 			id: settingsScreen
+
+			width: 720
+			height: 720
+			visible: false
+			onClosed: visible = false
+		}
+
+		CalendarScreen {
+			id: calendarScreen
 
 			width: 720
 			height: 720

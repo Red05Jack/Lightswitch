@@ -3,6 +3,8 @@
 #include "GoogleAuthorizer.h"
 #include "ICalendarProvider.h"
 
+#include <functional>
+
 #include <QList>
 #include <QNetworkAccessManager>
 #include <QObject>
@@ -11,7 +13,7 @@
 
 class QNetworkReply;
 
-// Loads the events of the primary Google calendar for the next seven days and serves them from a cache.
+// Loads events, contact birthdays and reminders (Google Tasks) for the next seven days and serves them from a cache.
 class GoogleCalendarProvider : public QObject, public ICalendarProvider {
 	Q_OBJECT
 
@@ -32,13 +34,19 @@ signals:
 	void AuthorizationUrlReady(const QUrl& url);
 
 private:
-	void FetchEvents(const QString& accessToken);
-	void HandleEventsReply(QNetworkReply* pReply);
+	void FetchAll(const QString& accessToken);
+	void FetchCalendar(const QString& calendarId, const QString& accessToken, bool isEssential);
+	void FetchReminders(const QString& accessToken);
+	void Fetch(const QUrl& url, const QString& accessToken, bool isEssential, std::function<void(const QByteArray&)> onSuccess);
+	void RebuildEvents();
 	void ScheduleRetry();
 
 	GoogleAuthorizer m_authorizer;
 	QNetworkAccessManager m_network;
 	QTimer m_refreshTimer;
 	QTimer m_retryTimer;
+	QList<CalendarEvent> m_calendarEvents;
+	QList<CalendarEvent> m_birthdayEvents;
+	QList<CalendarEvent> m_reminders;
 	QList<CalendarEvent> m_events;
 };
